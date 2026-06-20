@@ -1,0 +1,59 @@
+name: runic_sudoku
+description: >-
+  Phase 1 reusable app shell + grid core + Runic Sudoku vertical slice.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Phase 3: durable local key/value storage for saves + player profile.
+  # Official Flutter-team plugin, no manual native setup. See PHASE3_NOTES.md.
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  # Build-time generation of platform launcher icons from one source PNG.
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/levels/runic_sudoku_levels.json
+    # Per-chapter backgrounds (Phase 3.59). Listed individually so only the
+    # intended art ships (not stray files in the folder).
+    - assets/backgrounds/quick_runes_bg.png
+    - assets/backgrounds/normal_seals_bg.png
+    - assets/backgrounds/tricky_glyphs_bg.png
+    - assets/backgrounds/deep_chambers_bg.png
+    - assets/backgrounds/default_rune_bg.png
+
+# App launcher icon generation (run: dart run flutter_launcher_icons).
+# Source is a single flat PNG (assets/icon/icon.png); it is used for the standard
+# icon on every platform and as the Android adaptive foreground, with an inset so
+# the launcher's circular/rounded mask doesn't clip the grid (safe zone). The
+# black adaptive background matches the artwork's black surround so the inset
+# padding blends in. The source artwork is NOT modified; insetting + alpha removal
+# happen only in the generated platform assets.
+flutter_launcher_icons:
+  image_path: "assets/icon/icon.png"
+
+  android: true
+  min_sdk_android: 21
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icon/icon.png"
+  adaptive_icon_foreground_inset: 18
+
+  ios: true
+  remove_alpha_ios: true
+
+  windows:
+    generated: true
+    image_path: "assets/icon/icon.png"
+    icon_size: 256
