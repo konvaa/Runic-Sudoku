@@ -45,3 +45,7 @@ app.*.map.json
 /android/app/release
 
 dev_notes/
+
+*.jks
+*.keystore
+key.properties
