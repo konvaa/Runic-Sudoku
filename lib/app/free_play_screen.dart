@@ -111,12 +111,16 @@ class _FreeDifficultySelectScreenState
     _checkResumable();
   }
 
+  /// Re-evaluates whether a resumable session exists. Called in initState AND
+  /// every time we return to this screen, so the banner appears regardless of how
+  /// the player left the previous session (back button, app pause, or force-stop)
+  /// — the snapshot is only deleted on completion or "New Trial".
   Future<void> _checkResumable() async {
     final raw = await widget.services.save.load(_freePlayKey);
-    if (!mounted || raw == null) return;
-    final snap = RunicSudokuSnapshot.fromJson(raw);
-    // Only offer to resume an unfinished session.
-    if (!snap.completed) setState(() => _resumable = snap);
+    if (!mounted) return;
+    final snap = raw == null ? null : RunicSudokuSnapshot.fromJson(raw);
+    setState(() =>
+        _resumable = (snap != null && !snap.completed) ? snap : null);
   }
 
   /// The "Next Trial" supplier for [label] (Deep from the cache, others on
@@ -151,6 +155,8 @@ class _FreeDifficultySelectScreenState
         ),
       ),
     );
+    // Returned to the select screen (e.g. back button) — re-check for a session.
+    if (mounted) await _checkResumable();
   }
 
   Future<void> _discardResume() async {
@@ -191,6 +197,7 @@ class _FreeDifficultySelectScreenState
         ),
       ),
     );
+    if (mounted) await _checkResumable();
   }
 
   Future<void> _startDeep() async {
@@ -223,6 +230,7 @@ class _FreeDifficultySelectScreenState
         ),
       ),
     );
+    if (mounted) await _checkResumable();
   }
 
   /// "Next Trial" supplier for Deep: pull the next cached/bundled puzzle.

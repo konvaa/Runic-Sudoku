@@ -152,6 +152,20 @@ void main() {
     expect(RunicSudokuSnapshot.fromJson(raw!).completed, isFalse);
   });
 
+  test('leaving without completing (app_pause) keeps the slot resumable',
+      () async {
+    final save = LocalSaveRepository();
+    final c = await _freePlayController(save);
+    c.selectCell(const GridCoordinate(4, 4));
+    await c.inputValue(4); // in progress
+    await c.pause(); // back button / app pause flush — must NOT delete
+
+    final raw = await save.load(_freePlayKey);
+    expect(raw, isNotNull, reason: 'app_pause must not delete the session');
+    expect(RunicSudokuSnapshot.fromJson(raw!).completed, isFalse,
+        reason: 'still resumable → the Continue banner should appear');
+  });
+
   test('"New Trial" deletes the existing Free Play session', () async {
     final save = LocalSaveRepository();
     final c = await _freePlayController(save);
