@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../games/runic_sudoku/chapter_theme.dart';
@@ -160,7 +162,8 @@ class _LevelTile extends StatelessWidget {
     final completed = pc.isCompleted(levelId);
     final unlocked = pc.isLevelUnlocked(levelId);
     final isNext = pc.isNext(levelId);
-    final estMinutes = meta.estimatedSolveTime.inMinutes;
+    // Show at least 1 min so sub-60s levels don't read "~0 min".
+    final estMinutes = max(1, (meta.estimatedSolveTime.inSeconds / 60).round());
 
     final Widget leading;
     if (completed) {

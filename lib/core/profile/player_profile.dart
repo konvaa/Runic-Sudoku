@@ -43,6 +43,21 @@ class PlayerProfile implements Snapshot {
   /// (no migration logic — the field is just reserved).
   int progressionVersion;
 
+  // ---- Phase 3.66 Free Play stats ----
+  /// Total Free Play puzzles ever solved (all difficulties).
+  int freePlaysCompleted;
+
+  /// Best (fastest) solve time in whole seconds, keyed by difficulty token
+  /// ('Quick' / 'Normal' / 'Tricky' / 'Deep').
+  Map<String, int> freePlaysBestTimes;
+
+  /// Consecutive Free Play puzzles solved without leaving the Free Play flow.
+  int freePlaysCurrentStreak;
+
+  /// Deep Free Play puzzle ids already shown to the player (bundled-pool ids and
+  /// cache hashes), so we can prefer unseen puzzles. Grows unbounded; tiny data.
+  Set<String> deepUsedIds;
+
   PlayerProfile({
     required this.firstOpenTimestamp,
     this.sessionsCount = 0,
@@ -62,10 +77,16 @@ class PlayerProfile implements Snapshot {
     this.lastPlayedLevelId,
     Map<String, int>? chapterProgress,
     this.progressionVersion = 1,
+    this.freePlaysCompleted = 0,
+    Map<String, int>? freePlaysBestTimes,
+    this.freePlaysCurrentStreak = 0,
+    Set<String>? deepUsedIds,
   })  : completedLevelIds = completedLevelIds ?? <String>{},
         unlockedLevelIds = unlockedLevelIds ?? <String>{},
         unlockedChapterIds = unlockedChapterIds ?? <String>{},
-        chapterProgress = chapterProgress ?? <String, int>{};
+        chapterProgress = chapterProgress ?? <String, int>{},
+        freePlaysBestTimes = freePlaysBestTimes ?? <String, int>{},
+        deepUsedIds = deepUsedIds ?? <String>{};
 
   /// Spec alias for `completed_levels_count`.
   int get totalCompletedLevels => completedLevelsCount;
@@ -108,6 +129,10 @@ class PlayerProfile implements Snapshot {
         'last_played_level_id': lastPlayedLevelId,
         'chapter_progress': chapterProgress,
         'progression_version': progressionVersion,
+        'free_plays_completed': freePlaysCompleted,
+        'free_plays_best_times': freePlaysBestTimes,
+        'free_plays_current_streak': freePlaysCurrentStreak,
+        'deep_used_ids': deepUsedIds.toList()..sort(),
       };
 
   factory PlayerProfile.fromJson(Map<String, dynamic> json) {
@@ -150,6 +175,19 @@ class PlayerProfile implements Snapshot {
           e.key as String: (e.value as num).toInt(),
       },
       progressionVersion: (json['progression_version'] as num?)?.toInt() ?? 1,
+      freePlaysCompleted:
+          (json['free_plays_completed'] as num?)?.toInt() ?? 0,
+      freePlaysBestTimes: {
+        for (final e
+            in (json['free_plays_best_times'] as Map? ?? const {}).entries)
+          e.key as String: (e.value as num).toInt(),
+      },
+      freePlaysCurrentStreak:
+          (json['free_plays_current_streak'] as num?)?.toInt() ?? 0,
+      deepUsedIds: {
+        for (final id in (json['deep_used_ids'] as List? ?? const []))
+          id as String,
+      },
     );
   }
 }

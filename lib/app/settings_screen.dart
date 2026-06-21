@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _busy = false;
       _removeAdsOwned = result.isEntitled;
     });
-    _toast('Remove ads: ${result.status.name}');
+    _toast('Remove Interstitial Ads: ${result.status.name}');
   }
 
   Future<void> _restore() async {
@@ -98,9 +98,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const Divider(height: 32),
               const _SectionHeader('Purchases'),
               ListTile(
-                title: const Text('Remove ads'),
-                subtitle:
+                title: const Text('Remove Interstitial Ads'),
+                isThreeLine: true,
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(_removeAdsOwned ? 'Owned' : 'Not purchased'),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Hints remain available as optional rewarded ads',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
                 trailing: _busy
                     ? const SizedBox(
                         width: 20,

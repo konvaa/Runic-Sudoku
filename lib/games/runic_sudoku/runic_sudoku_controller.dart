@@ -41,16 +41,36 @@ class RunicSudokuController extends ChangeNotifier {
                 dimensions: state.dimensions, boxShape: state.boxShape);
 
   /// Loads an existing save for [puzzle] or starts a fresh game.
+  ///
+  /// When [fresh] is true, any existing save under this level id is ignored and a
+  /// brand-new game is started (used by Free Play, whose puzzles reuse one save
+  /// slot per difficulty and must never resume a previous, different puzzle).
   static Future<RunicSudokuController> loadOrCreate({
     required ManualPuzzle puzzle,
     required SaveService saveService,
     required AnalyticsService analytics,
+    bool fresh = false,
+    PuzzleMode mode = PuzzleMode.campaign,
+    String? puzzleId,
   }) async {
-    final key = '${RunicSudokuSnapshot.gameIdValue}/${puzzle.levelId}';
-    final raw = await saveService.load(key);
-    final state = raw != null
-        ? RunicSudokuState.fromSnapshot(RunicSudokuSnapshot.fromJson(raw))
-        : RunicSudokuState.fromPuzzle(puzzle);
+    // Daily / Free Play use a single shared slot, so a saved snapshot there might
+    // belong to a DIFFERENT puzzle (e.g. yesterday's daily). Only resume it when
+    // its givens match the requested puzzle; otherwise start fresh + overwrite.
+    final key = saveKeyFor(mode, puzzle.levelId);
+    final raw = fresh ? null : await saveService.load(key);
+    var startedFresh = raw == null;
+    final RunicSudokuState state;
+    if (raw != null) {
+      final snap = RunicSudokuSnapshot.fromJson(raw);
+      if (_sameGrid(snap.givenCells, puzzle.givenCells)) {
+        state = RunicSudokuState.fromSnapshot(snap);
+      } else {
+        state = RunicSudokuState.fromPuzzle(puzzle, mode: mode, puzzleId: puzzleId);
+        startedFresh = true;
+      }
+    } else {
+      state = RunicSudokuState.fromPuzzle(puzzle, mode: mode, puzzleId: puzzleId);
+    }
 
     // The hint system needs the logical solving order. The pool JSON does not
     // store solver_steps_log, so recompute it once here from the original puzzle
@@ -66,7 +86,7 @@ class RunicSudokuController extends ChangeNotifier {
       analytics: analytics,
       solverSteps: steps,
     );
-    if (raw == null) {
+    if (startedFresh) {
       await controller.save(SaveTriggerType.levelStart);
     }
     return controller;
@@ -265,4 +285,16 @@ class RunicSudokuController extends ChangeNotifier {
     _ticker?.cancel();
     super.dispose();
   }
+}
+
+/// True when two given-cell grids are identical (same puzzle identity).
+bool _sameGrid(List<List<int>> a, List<List<int>> b) {
+  if (a.length != b.length) return false;
+  for (var r = 0; r < a.length; r++) {
+    if (a[r].length != b[r].length) return false;
+    for (var c = 0; c < a[r].length; c++) {
+      if (a[r][c] != b[r][c]) return false;
+    }
+  }
+  return true;
 }

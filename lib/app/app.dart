@@ -7,11 +7,14 @@ import '../core/purchases/purchase_service.dart';
 import '../core/save/save_service.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/theme_manager.dart';
+import '../games/runic_sudoku/freeplay/deep_free_play_cache.dart';
 import '../games/runic_sudoku/level_pool.dart';
 import '../games/runic_sudoku/manual_puzzle.dart';
 import '../games/runic_sudoku/progression.dart';
 import '../games/runic_sudoku/progression_controller.dart';
 import '../games/runic_sudoku/runic_sudoku_screen.dart';
+import '../games/runic_sudoku/solver/difficulty_constants.dart';
+import 'free_play_screen.dart';
 import 'level_select_screen.dart';
 import 'main_menu_screen.dart';
 import 'routes.dart';
@@ -38,6 +41,10 @@ class AppServices {
   final Progression progression;
   final ProgressionController progressionController;
 
+  /// Deep Free Play bundled-pool + rolling-cache supply (Phase 3.66.1). Optional
+  /// so lightweight tests can omit it; production (`main.dart`) always wires it.
+  final DeepFreePlayCache? deepCache;
+
   const AppServices({
     required this.save,
     required this.analytics,
@@ -48,6 +55,7 @@ class AppServices {
     required this.levelPool,
     required this.progression,
     required this.progressionController,
+    this.deepCache,
   });
 }
 
@@ -65,6 +73,31 @@ extension PuzzleNavigation on AppServices {
         appController: appController,
         progressionController: progressionController,
         isDaily: isDaily,
+        deepCache: deepCache,
+      );
+
+  /// Builds a Free Play play screen (Phase 3.66): on-demand [puzzle] of [label],
+  /// with [generateNext] driving the "Next Trial" loop.
+  RunicSudokuScreen freePlayScreen(
+    ManualPuzzle puzzle,
+    DifficultyLabel label, {
+    required Future<ManualPuzzle?> Function() generateNext,
+    bool resume = false,
+  }) =>
+      RunicSudokuScreen(
+        puzzle: puzzle,
+        saveService: save,
+        analytics: analytics,
+        symbolSet: themeManager.currentSymbolSet,
+        ads: ads,
+        purchases: purchases,
+        appController: appController,
+        progressionController: progressionController,
+        isFreePlay: true,
+        freePlayLabel: label,
+        generateNext: generateNext,
+        deepCache: deepCache,
+        freePlayResume: resume,
       );
 }
 
@@ -95,6 +128,11 @@ class RunicSudokuApp extends StatelessWidget {
       case AppRoutes.levelSelect:
         return MaterialPageRoute(
           builder: (_) => LevelSelectScreen(services: services),
+          settings: settings,
+        );
+      case AppRoutes.freePlay:
+        return MaterialPageRoute(
+          builder: (_) => FreeDifficultySelectScreen(services: services),
           settings: settings,
         );
       case AppRoutes.settings:

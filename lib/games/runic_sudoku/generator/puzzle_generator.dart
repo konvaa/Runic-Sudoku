@@ -7,6 +7,7 @@ import '../solver/difficulty_constants.dart';
 import '../solver/fast_uniqueness_solver.dart';
 import '../solver/human_like_solver.dart';
 import 'difficulty_scorer.dart';
+import 'free_play_guardrails.dart';
 import 'full_grid_generator.dart';
 import 'level_data.dart';
 
@@ -60,20 +61,33 @@ class PuzzleGenerator {
         _scorer = const DifficultyScorer();
 
   /// Generates a puzzle whose candidate_complexity falls in [target]'s band.
+  ///
+  /// When [freePlay] is true, the carve additionally enforces
+  /// [FreePlayGuardrails] (no/limited empty rows/cols/boxes, a guaranteed naked
+  /// single from the start) so on-demand puzzles start cleanly. This flag is OFF
+  /// by default, so the pre-generated campaign pool is unaffected.
   GenerationResult generate({
     required DifficultyLabel target,
     int? seed,
     int maxAttempts = 200,
+    bool freePlay = false,
   }) {
     final baseSeed = seed ?? DateTime.now().microsecondsSinceEpoch;
     final (lo, hi) = _scorer.complexityBand(target);
+
+    // Free Play: require each candidate to also satisfy the guardrails. Applied
+    // inside the carve so we keep the deepest in-band puzzle that PASSES, rather
+    // than rejecting the whole attempt — this keeps rejection rates low.
+    final bool Function(List<List<int>>)? accept = freePlay
+        ? (g) => FreePlayGuardrails.passes(g, target, dimensions, boxShape)
+        : null;
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       final attemptSeed = baseSeed + attempt;
       final rng = Random(attemptSeed);
       final full = _full.generate(rng);
 
-      final carved = _carveToBand(full, rng, lo, hi);
+      final carved = _carveToBand(full, rng, lo, hi, accept: accept);
       if (carved == null) continue;
 
       return GenerationResult(
@@ -108,8 +122,9 @@ class PuzzleGenerator {
     List<List<int>> full,
     Random rng,
     double lo,
-    double hi,
-  ) {
+    double hi, {
+    bool Function(List<List<int>>)? accept,
+  }) {
     final puzzle = [for (final row in full) List<int>.from(row)];
     final order = [
       for (var r = 0; r < dimensions.rows; r++)
@@ -134,8 +149,10 @@ class PuzzleGenerator {
         puzzle[coord.row][coord.col] = saved; // overshoot or unsolvable: keep clue
         continue;
       }
-      // Accepted removal (unique, solvable, complexity < hi).
-      if (metrics.candidateComplexity >= lo) {
+      // Accepted removal (unique, solvable, complexity < hi). For Free Play also
+      // require the guardrails to pass before recording this as the best so far.
+      if (metrics.candidateComplexity >= lo &&
+          (accept == null || accept(puzzle))) {
         best = ([for (final row in puzzle) List<int>.from(row)], metrics);
       }
     }

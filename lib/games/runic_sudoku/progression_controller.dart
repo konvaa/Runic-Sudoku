@@ -18,6 +18,11 @@ class ProgressionController {
   bool isChapterUnlocked(String chapterId) =>
       progression.isChapterUnlocked(chapterId, app.completedLevelIds);
 
+  /// Whether Free Play is unlocked (Quick Runes chapter completed). Derived live
+  /// from the completed set — no separate persisted flag to drift (Phase 3.66).
+  bool get freePlayUnlocked =>
+      progression.isFreePlayUnlocked(app.completedLevelIds);
+
   bool isCompleted(String levelId) => app.isCompleted(levelId);
 
   String? get nextLevelId => progression.nextLevelId(app.completedLevelIds);

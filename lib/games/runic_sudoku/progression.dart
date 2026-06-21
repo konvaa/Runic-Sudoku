@@ -142,6 +142,15 @@ class Progression {
   int completedInChapter(ChapterMeta chapter, Set<String> completed) =>
       chapter.levelIds.where(completed.contains).length;
 
+  /// Free Play (Phase 3.66) unlocks once the FIRST chapter (Quick Runes) is
+  /// completed to its unlock threshold — i.e. the same condition that opens
+  /// chapter 2. Pure function of [completed], so it can never drift.
+  bool isFreePlayUnlocked(Set<String> completed) {
+    if (chapters.isEmpty) return false;
+    final first = chapters.first;
+    return completedInChapter(first, completed) >= thresholdFor(first);
+  }
+
   bool isChapterUnlocked(String chapterId, Set<String> completed) {
     final chapter = chapterById(chapterId);
     if (chapter == null) return false;

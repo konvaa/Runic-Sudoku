@@ -57,6 +57,26 @@ class AppController extends ChangeNotifier {
   int get dailyStreak => profile.dailyStreak;
   Duration get sessionDuration => DateTime.now().difference(_sessionStart);
 
+  // Free Play stats (Phase 3.66).
+  int get freePlaysCompleted => profile.freePlaysCompleted;
+  int get freePlaysCurrentStreak => profile.freePlaysCurrentStreak;
+  Map<String, int> get freePlaysBestTimes =>
+      Map.unmodifiable(profile.freePlaysBestTimes);
+
+  /// Best Free Play solve time (whole seconds) for [difficultyLabel], or null.
+  int? bestFreePlayTime(String difficultyLabel) =>
+      profile.freePlaysBestTimes[difficultyLabel];
+
+  /// Deep Free Play puzzle ids already shown to the player.
+  Set<String> get deepUsedIds => Set.unmodifiable(profile.deepUsedIds);
+
+  /// Marks a Deep Free Play puzzle as seen (persisted; no listener notify — no
+  /// UI depends on this set).
+  Future<void> markDeepUsed(String puzzleId) async {
+    if (!profile.deepUsedIds.add(puzzleId)) return;
+    await _save(SaveTriggerType.appPause);
+  }
+
   // Campaign progression (the game layer computes these; this just stores them).
   Set<String> get unlockedLevelIds =>
       Set.unmodifiable(profile.unlockedLevelIds);
@@ -130,6 +150,48 @@ class AppController extends ChangeNotifier {
   /// Whole-day ordinal (DST-safe) for streak arithmetic.
   static int _dayNumber(DateTime d) =>
       DateTime.utc(d.year, d.month, d.day).millisecondsSinceEpoch ~/ 86400000;
+
+  // ---- Free Play (Phase 3.66) ---------------------------------------------
+
+  /// Records a solved Free Play puzzle. Deliberately INDEPENDENT of campaign and
+  /// daily: it never touches `completed_level_ids`, the campaign count, or the
+  /// daily streak. It updates the Free Play stats and advances the shared
+  /// interstitial cadence (so ads fire at the same every-3rd-completion rate).
+  Future<void> onFreePlayCompleted(
+    String difficultyLabel,
+    Duration solveTime, {
+    DateTime? date,
+  }) async {
+    profile.freePlaysCompleted++;
+    profile.freePlaysCurrentStreak++;
+
+    final secs = solveTime.inSeconds;
+    final prev = profile.freePlaysBestTimes[difficultyLabel];
+    if (prev == null || secs < prev) {
+      profile.freePlaysBestTimes[difficultyLabel] = secs;
+    }
+
+    profile.levelsSinceInterstitial++; // same ad cadence as campaign levels
+    profile.lastPlayedDate = _dateOnly(date ?? DateTime.now());
+
+    await _save(SaveTriggerType.levelComplete);
+    await analytics.log('free_play_completed', {
+      'difficulty': difficultyLabel,
+      'solve_seconds': secs,
+      'free_plays_completed': profile.freePlaysCompleted,
+      'streak': profile.freePlaysCurrentStreak,
+    });
+    notifyListeners();
+  }
+
+  /// Resets the consecutive Free Play streak (called when the player leaves the
+  /// Free Play flow / starts a new session).
+  Future<void> resetFreePlayStreak() async {
+    if (profile.freePlaysCurrentStreak == 0) return;
+    profile.freePlaysCurrentStreak = 0;
+    await _save(SaveTriggerType.appPause);
+    notifyListeners();
+  }
 
   // ---- Monetization decisions + recording ---------------------------------
 

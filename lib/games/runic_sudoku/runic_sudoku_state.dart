@@ -21,6 +21,11 @@ class RunicSudokuState {
   final String difficultyLabel;
   final Duration estimatedSolveTime;
 
+  /// Entry point this session belongs to + stable puzzle identity (Phase
+  /// 3.66.2). Campaign/daily leave [puzzleId] null.
+  final PuzzleMode mode;
+  final String? puzzleId;
+
   // ---- Mutable progress ----
   final List<List<int>> currentGrid;
   final List<List<Set<int>>> notes;
@@ -49,6 +54,8 @@ class RunicSudokuState {
     required this.startedAt,
     required this.elapsedTime,
     required this.lastSavedAt,
+    this.mode = PuzzleMode.campaign,
+    this.puzzleId,
     this.selected,
     this.notesMode = false,
     this.mistakesCount = 0,
@@ -59,7 +66,12 @@ class RunicSudokuState {
   });
 
   /// Fresh state for a new game from a hand-authored puzzle.
-  factory RunicSudokuState.fromPuzzle(ManualPuzzle p, {DateTime? now}) {
+  factory RunicSudokuState.fromPuzzle(
+    ManualPuzzle p, {
+    DateTime? now,
+    PuzzleMode mode = PuzzleMode.campaign,
+    String? puzzleId,
+  }) {
     final ts = now ?? DateTime.now();
     return RunicSudokuState(
       levelId: p.levelId,
@@ -75,6 +87,8 @@ class RunicSudokuState {
       startedAt: ts,
       elapsedTime: Duration.zero,
       lastSavedAt: ts,
+      mode: mode,
+      puzzleId: puzzleId,
     );
   }
 
@@ -89,6 +103,8 @@ class RunicSudokuState {
       givenCells: s.givenCells,
       difficultyLabel: s.difficultyLabel,
       estimatedSolveTime: s.estimatedSolveTime,
+      mode: s.mode,
+      puzzleId: s.puzzleId,
       currentGrid: [for (final r in s.currentGrid) List<int>.from(r)],
       notes: [
         for (final row in s.notesGrid) [for (final cell in row) cell.toSet()],
@@ -141,6 +157,8 @@ class RunicSudokuState {
       difficultyLabel: difficultyLabel,
       estimatedSolveTime: estimatedSolveTime,
       actualSolveTime: actualSolveTime,
+      mode: mode,
+      puzzleId: puzzleId,
     );
   }
 }

@@ -6,6 +6,7 @@
 class AppRoutes {
   static const String mainMenu = '/';
   static const String levelSelect = '/levels';
+  static const String freePlay = '/freeplay';
   static const String settings = '/settings';
 
   const AppRoutes._();

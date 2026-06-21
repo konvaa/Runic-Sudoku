@@ -2,6 +2,42 @@ import '../../core/save/snapshot.dart';
 import '../../grid/box_shape.dart';
 import '../../grid/grid_dimensions.dart';
 
+/// Which entry point a session belongs to (Phase 3.66.2). Lets a persisted
+/// session identify itself independently of its save slot.
+enum PuzzleMode { campaign, daily, freePlay }
+
+/// The save slot for a session. Daily and Free Play each get ONE dedicated slot
+/// so they never collide with a campaign level that happens to share a level id
+/// (Phase 3.66.2 follow-up). Campaign keeps its per-level `rs_NNN` key.
+String saveKeyFor(PuzzleMode mode, String levelId) {
+  const g = RunicSudokuSnapshot.gameIdValue;
+  switch (mode) {
+    case PuzzleMode.daily:
+      return '$g/active_daily';
+    case PuzzleMode.freePlay:
+      return '$g/active_freeplay';
+    case PuzzleMode.campaign:
+      return '$g/$levelId';
+  }
+}
+
+PuzzleMode _parseMode(Object? v) => PuzzleMode.values.firstWhere(
+      (m) => m.name == v,
+      orElse: () => PuzzleMode.campaign,
+    );
+
+/// Stable content hash of a given-cells grid (FNV-1a, 8 hex). Used as a Free
+/// Play `puzzleId` so a saved session can be recognised.
+String puzzleIdFromGivens(List<List<int>> given) {
+  final s = given.map((r) => r.join(',')).join('|');
+  var h = 0x811c9dc5;
+  for (final unit in s.codeUnits) {
+    h ^= unit;
+    h = (h * 0x01000193) & 0xFFFFFFFF;
+  }
+  return h.toRadixString(16).padLeft(8, '0');
+}
+
 /// Complete, serializable state of a Runic Sudoku level.
 ///
 /// Implements [Snapshot] so it can be stored by the generic save service. All
@@ -54,6 +90,13 @@ class RunicSudokuSnapshot implements Snapshot {
   /// Total play time once solved; null while unfinished.
   final Duration? actualSolveTime;
 
+  /// Which entry point this session belongs to (Phase 3.66.2). Defaults to
+  /// [PuzzleMode.campaign] so legacy saves without the field still parse.
+  final PuzzleMode mode;
+
+  /// Stable puzzle identity (Free Play only); null for campaign/daily.
+  final String? puzzleId;
+
   const RunicSudokuSnapshot({
     this.gameId = gameIdValue,
     required this.levelId,
@@ -74,10 +117,12 @@ class RunicSudokuSnapshot implements Snapshot {
     required this.difficultyLabel,
     required this.estimatedSolveTime,
     this.actualSolveTime,
+    this.mode = PuzzleMode.campaign,
+    this.puzzleId,
   });
 
   @override
-  String get saveKey => '$gameId/$levelId';
+  String get saveKey => saveKeyFor(mode, levelId);
 
   @override
   Map<String, dynamic> toJson() => {
@@ -100,6 +145,8 @@ class RunicSudokuSnapshot implements Snapshot {
         'difficulty_label': difficultyLabel,
         'estimated_solve_time': estimatedSolveTime.inMilliseconds,
         'actual_solve_time': actualSolveTime?.inMilliseconds,
+        'mode': mode.name,
+        'puzzle_id': puzzleId,
       };
 
   factory RunicSudokuSnapshot.fromJson(Map<String, dynamic> json) {
@@ -138,6 +185,8 @@ class RunicSudokuSnapshot implements Snapshot {
           Duration(milliseconds: (json['estimated_solve_time'] as num).toInt()),
       actualSolveTime:
           actual == null ? null : Duration(milliseconds: (actual as num).toInt()),
+      mode: _parseMode(json['mode']),
+      puzzleId: json['puzzle_id'] as String?,
     );
   }
 
@@ -172,6 +221,8 @@ class RunicSudokuSnapshot implements Snapshot {
       difficultyLabel: difficultyLabel,
       estimatedSolveTime: estimatedSolveTime,
       actualSolveTime: actualSolveTime ?? this.actualSolveTime,
+      mode: mode,
+      puzzleId: puzzleId,
     );
   }
 }

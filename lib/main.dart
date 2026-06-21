@@ -9,6 +9,8 @@ import 'core/purchases/noop_purchase_service.dart';
 import 'core/save/local_save_repository.dart';
 import 'core/save/shared_preferences_save_store.dart';
 import 'core/theme/theme_manager.dart';
+import 'games/runic_sudoku/freeplay/deep_free_play_cache.dart';
+import 'games/runic_sudoku/freeplay/deep_pool.dart';
 import 'games/runic_sudoku/level_pool.dart';
 import 'games/runic_sudoku/progression.dart';
 import 'games/runic_sudoku/progression_controller.dart';
@@ -43,6 +45,19 @@ Future<void> main() async {
       ProgressionController(app: appController, progression: progression);
   await progressionController.ensureInitialized();
 
+  // Deep Free Play supply (Phase 3.66.1): bundled pool + rolling cache. Load the
+  // persisted cache; if it is low, start background refill immediately, otherwise
+  // defer it (the Free Play entry / leaving the first puzzle will trigger it) so
+  // it never competes with startup.
+  final deepPool = await DeepBundledPool.loadFromAsset();
+  final deepCache = DeepFreePlayCache(
+    store: store,
+    appController: appController,
+    bundledPool: deepPool,
+  );
+  await deepCache.load();
+  if (deepCache.cacheSize < 5) deepCache.startRefill();
+
   final services = AppServices(
     save: save,
     analytics: analytics,
@@ -53,6 +68,7 @@ Future<void> main() async {
     levelPool: levelPool,
     progression: progression,
     progressionController: progressionController,
+    deepCache: deepCache,
   );
 
   runApp(RunicSudokuApp(services: services));

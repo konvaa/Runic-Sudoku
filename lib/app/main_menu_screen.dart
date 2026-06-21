@@ -101,6 +101,36 @@ class MainMenuScreen extends StatelessWidget {
                   label: const Text('Rune Trials'),
                 ),
                 const SizedBox(height: 14),
+                // Free Play (Phase 3.66): unlocks after the Quick Runes chapter.
+                AnimatedBuilder(
+                  animation: services.appController,
+                  builder: (context, _) {
+                    final unlocked =
+                        services.progressionController.freePlayUnlocked;
+                    if (unlocked) {
+                      return FilledButton.icon(
+                        style: primaryStyle,
+                        onPressed: () => Navigator.of(context)
+                            .pushNamed(AppRoutes.freePlay),
+                        icon: const Icon(Icons.auto_awesome),
+                        label: const Text('Free Play'),
+                      );
+                    }
+                    return OutlinedButton.icon(
+                      style: outlineStyle,
+                      onPressed: () =>
+                          ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text('Complete Quick Runes chapter to unlock'),
+                        ),
+                      ),
+                      icon: const Icon(Icons.lock),
+                      label: const Text('Free Play'),
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
                 OutlinedButton.icon(
                   style: outlineStyle,
                   onPressed: () =>

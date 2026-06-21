@@ -26,6 +26,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/levels/runic_sudoku_levels.json
+    # Deep Free Play bundled starting pool (Phase 3.66.1).
+    - assets/freeplay/deep_pool.json
     # Per-chapter backgrounds (Phase 3.59). Listed individually so only the
     # intended art ships (not stray files in the folder).
     - assets/backgrounds/quick_runes_bg.png
