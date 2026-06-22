@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193010253277",
+    "project_id": "runic-sudoku",
+    "storage_bucket": "runic-sudoku.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193010253277:android:cd1272ea079bf176388a34",
+        "android_client_info": {
+          "package_name": "com.konvicny.runicsudoku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGiuY1gH4pGiRjFVVwRIjhizypgVBnu_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

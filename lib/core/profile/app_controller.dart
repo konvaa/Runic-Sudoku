@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../analytics/analytics_service.dart';
 import '../monetization/monetization_policy.dart';
+import '../purchases/purchase_service.dart';
 import '../save/save_service.dart';
 import '../save/save_trigger_type.dart';
 import 'player_profile.dart';
@@ -237,6 +238,15 @@ class AppController extends ChangeNotifier {
     await _save(SaveTriggerType.purchaseCompleted);
     await analytics.log('remove_ads_purchased', const {});
     notifyListeners();
+  }
+
+  /// Synchronises the Remove Ads entitlement from the store at startup (Phase 4).
+  /// Queries [purchases] and GRANTS the entitlement if owned — so it survives a
+  /// reinstall / device change. It never REVOKES locally (a transient store query
+  /// failure must not strip a purchase the player already made).
+  Future<void> syncRemoveAdsEntitlement(PurchaseService purchases) async {
+    final owned = await purchases.isRemoveAdsOwned();
+    if (owned) await setRemoveAdsPurchased();
   }
 
   // ---- Campaign progression (Phase 3.5) -----------------------------------

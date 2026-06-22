@@ -21,6 +21,10 @@ plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "8.11.1" apply false
     id("org.jetbrains.kotlin.android") version "2.2.20" apply false
+    // Phase 4: Google Services / Crashlytics are loaded via the buildscript
+    // classpath in android/build.gradle.kts (their plugin markers are not
+    // reliably resolvable through the plugins{} DSL here), then applied in
+    // android/app/build.gradle.kts.
 }
 
 include(":app")

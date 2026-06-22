@@ -1,3 +1,17 @@
+// Phase 4: Firebase / AdMob Gradle plugins via the classic buildscript classpath
+// (their plugin-marker artifacts are not reliably resolvable through the
+// settings.gradle.kts plugins{} DSL in this setup). Applied in app/build.gradle.kts.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.google.gms:google-services:4.4.2")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:3.0.2")
+    }
+}
+
 allprojects {
     repositories {
         google()

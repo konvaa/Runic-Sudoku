@@ -29,7 +29,8 @@ android {
 
     defaultConfig {
         applicationId = "com.konvicny.runicsudoku"
-        minSdk = flutter.minSdkVersion
+        // google_mobile_ads 5.x requires Android API 23+.
+        minSdk = maxOf(23, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -54,3 +55,9 @@ android {
 flutter {
     source = "../.."
 }
+
+// Phase 4: apply the Firebase / Google Services plugins from the buildscript
+// classpath (declared in android/build.gradle.kts). Must come after the Android
+// application plugin, hence applied at the bottom.
+apply(plugin = "com.google.gms.google-services")
+apply(plugin = "com.google.firebase.crashlytics")
