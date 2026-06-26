@@ -239,6 +239,7 @@ class _RunicSudokuScreenState extends State<RunicSudokuScreen>
           const SizedBox(height: 12),
           NotesPanel(
             notesMode: c.notesMode,
+            checkIsFree: c.hasFreeCheck,
             onToggleNotes: c.toggleNotesMode,
             onCheck: () => _onCheck(c),
             onHint: () => _onHint(c),

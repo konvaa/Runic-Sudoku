@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../games/runic_sudoku/chapter_theme.dart';
 import 'app.dart';
+import 'how_to_play_dialog.dart';
 import 'routes.dart';
 
 /// Title screen: Daily puzzle (with streak), Campaign, Settings.
@@ -25,6 +26,32 @@ class MainMenuScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
           builder: (_) => services.puzzleScreen(daily, isDaily: true)),
+    );
+  }
+
+  /// Shown when Free Play is tapped while still locked: an explicit unlock
+  /// requirement + a one-tap shortcut to Rune Trials (Phase 3.66 UX fix).
+  void _showLockedMessage(BuildContext context) {
+    final progression = services.progression;
+    final firstChapter =
+        progression.chapters.isNotEmpty ? progression.chapters.first : null;
+    final threshold =
+        firstChapter != null ? progression.thresholdFor(firstChapter) : 10;
+    final chapterName = firstChapter?.displayName ?? 'Quick Runes';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Complete $threshold $chapterName levels in Rune Trials to unlock '
+          'Free Play.',
+        ),
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: 'Go to Rune Trials',
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.levelSelect),
+        ),
+      ),
     );
   }
 
@@ -118,13 +145,7 @@ class MainMenuScreen extends StatelessWidget {
                     }
                     return OutlinedButton.icon(
                       style: outlineStyle,
-                      onPressed: () =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Complete Quick Runes chapter to unlock'),
-                        ),
-                      ),
+                      onPressed: () => _showLockedMessage(context),
                       icon: const Icon(Icons.lock),
                       label: const Text('Free Play'),
                     );
@@ -137,6 +158,13 @@ class MainMenuScreen extends StatelessWidget {
                       Navigator.of(context).pushNamed(AppRoutes.settings),
                   icon: const Icon(Icons.settings),
                   label: const Text('Settings'),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  style: outlineStyle,
+                  onPressed: () => showHowToPlayDialog(context),
+                  icon: const Icon(Icons.help_outline),
+                  label: const Text('How to Play'),
                 ),
               ],
             ),

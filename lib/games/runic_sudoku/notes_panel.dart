@@ -6,6 +6,11 @@ import 'package:flutter/material.dart';
 /// only toggles the mode and exposes the assist actions.
 class NotesPanel extends StatelessWidget {
   final bool notesMode;
+
+  /// True while the puzzle's one free mistake-check is still available; once used
+  /// the check is gated behind a rewarded ad. Drives the Check button label.
+  final bool checkIsFree;
+
   final VoidCallback onToggleNotes;
   final VoidCallback onCheck;
   final VoidCallback onHint;
@@ -16,6 +21,7 @@ class NotesPanel extends StatelessWidget {
     required this.onToggleNotes,
     required this.onCheck,
     required this.onHint,
+    this.checkIsFree = true,
   });
 
   @override
@@ -30,8 +36,10 @@ class NotesPanel extends StatelessWidget {
           onTap: onToggleNotes,
         ),
         _ActionChip(
-          icon: Icons.fact_check_outlined,
-          label: 'Check',
+          icon: checkIsFree
+              ? Icons.fact_check_outlined
+              : Icons.ondemand_video, // rewarded-ad icon once the free check is used
+          label: checkIsFree ? 'Check (Free)' : 'Check (Ad)',
           onTap: onCheck,
         ),
         _ActionChip(

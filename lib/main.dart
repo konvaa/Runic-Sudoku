@@ -87,7 +87,7 @@ Future<void> main() async {
     MobileAds.instance.updateRequestConfiguration(
       // TODO: add your test device's GAID so you see real test ads on it.
       // Find it in: Android Settings → Google → Ads → Advertising ID.
-      RequestConfiguration(testDeviceIds: const ['TEST_DEVICE_ID_PLACEHOLDER']),
+      RequestConfiguration(testDeviceIds: const ['2599f83f-cbd7-4507-bc79-ec834e09e4bb']),
     );
     final admob = AdMobAdsService(
       interstitialsSuppressed: () => appController.removeAdsPurchased,
