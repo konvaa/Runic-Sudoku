@@ -16,12 +16,17 @@ class RuneInputPanel extends StatelessWidget {
   final ValueChanged<int> onValue;
   final VoidCallback onErase;
 
+  /// Clears the whole player solution (with confirmation, handled by the
+  /// caller). Null hides the Reset button — e.g. once the puzzle is solved.
+  final VoidCallback? onReset;
+
   const RuneInputPanel({
     super.key,
     required this.symbolSet,
     required this.count,
     required this.onValue,
     required this.onErase,
+    this.onReset,
   });
 
   @override
@@ -42,19 +47,33 @@ class RuneInputPanel extends StatelessWidget {
           button: true,
           child: OutlinedButton(
             onPressed: onErase,
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(52, 52),
-              padding: EdgeInsets.zero,
-              foregroundColor: _runeGold,
-              side: const BorderSide(color: _runeGold),
-              shape: const CircleBorder(),
-            ),
+            style: _circleButtonStyle,
             child: const Icon(Icons.backspace_outlined),
           ),
         ),
+        // Reset: same look as Erase, only a different icon. Clears the whole
+        // solution (with confirmation). Hidden when [onReset] is null.
+        if (onReset != null)
+          Semantics(
+            label: 'Reset board',
+            button: true,
+            child: OutlinedButton(
+              onPressed: onReset,
+              style: _circleButtonStyle,
+              child: const Icon(Icons.refresh),
+            ),
+          ),
       ],
     );
   }
+
+  static final ButtonStyle _circleButtonStyle = OutlinedButton.styleFrom(
+    minimumSize: const Size(52, 52),
+    padding: EdgeInsets.zero,
+    foregroundColor: _runeGold,
+    side: const BorderSide(color: _runeGold),
+    shape: const CircleBorder(),
+  );
 }
 
 class _RuneButton extends StatelessWidget {

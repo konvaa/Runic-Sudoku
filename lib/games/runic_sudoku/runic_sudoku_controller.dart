@@ -187,6 +187,30 @@ class RunicSudokuController extends ChangeNotifier {
     await save(SaveTriggerType.placementComplete);
   }
 
+  /// True if the player has entered any value (in a non-given cell) or any note.
+  bool get hasPlayerProgress {
+    for (final c in state.dimensions.coordinates) {
+      if (!state.isGiven(c) && state.currentGrid[c.row][c.col] != 0) return true;
+      if (state.notesAt(c).isNotEmpty) return true;
+    }
+    return false;
+  }
+
+  /// Resets the player's solution: clears every player-entered value and all
+  /// notes, keeping the given clues. Deliberately does NOT touch the timer,
+  /// mistakes, hints, or checks — it's "clear my work on this puzzle", not a
+  /// level restart. No-op once the puzzle is solved.
+  Future<void> resetBoard() async {
+    if (state.completed) return;
+    for (final c in state.dimensions.coordinates) {
+      if (!state.isGiven(c)) state.currentGrid[c.row][c.col] = 0;
+      state.notesAt(c).clear();
+    }
+    _errorCells = {};
+    notifyListeners();
+    await save(SaveTriggerType.placementComplete);
+  }
+
   void toggleNotesMode() {
     state.notesMode = !state.notesMode;
     notifyListeners();

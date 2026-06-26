@@ -250,6 +250,8 @@ class _RunicSudokuScreenState extends State<RunicSudokuScreen>
             count: c.rules.maxValue,
             onValue: c.inputValue,
             onErase: c.erase,
+            // Hide Reset once solved (no resetting a finished puzzle).
+            onReset: c.completed ? null : () => _onReset(c),
           ),
         ],
       ),
@@ -340,6 +342,34 @@ class _RunicSudokuScreenState extends State<RunicSudokuScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  // ---- Reset board ---------------------------------------------------------
+
+  Future<void> _onReset(RunicSudokuController c) async {
+    if (c.completed) return;
+    if (!c.hasPlayerProgress) {
+      _snack('Nothing to reset.');
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Reset board?'),
+        content: const Text('Clear all entered runes and notes?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await c.resetBoard();
   }
 
   // ---- Win + level-complete monetization flow (Phase 3) -------------------
