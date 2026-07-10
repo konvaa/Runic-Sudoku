@@ -16,7 +16,17 @@ class RunicSudokuRules {
   final GridDimensions dimensions;
   final BoxShape boxShape;
 
-  const RunicSudokuRules({required this.dimensions, required this.boxShape});
+  /// Explicit rune count, when supplied to the constructor; null means "derive
+  /// from [dimensions]". Stored nullable so the const constructor can keep its
+  /// existing call sites unchanged (a const initializer cannot read
+  /// `dimensions.cols`). Read via [runeCount], never directly.
+  final int? _explicitRuneCount;
+
+  const RunicSudokuRules({
+    required this.dimensions,
+    required this.boxShape,
+    int? runeCount,
+  }) : _explicitRuneCount = runeCount;
 
   /// Standard 6x6 / 2x3 configuration used by the first game.
   static const sixBySix = RunicSudokuRules(
@@ -24,7 +34,29 @@ class RunicSudokuRules {
     boxShape: BoxShape(rows: 2, cols: 3),
   );
 
-  int get maxValue => dimensions.cols; // 1..maxValue are legal values.
+  /// Chapter 1's rune count (6×6 board → 6 runes). Named here — next to the
+  /// [sixBySix] preset that defines Chapter 1's board — so UI copy can
+  /// reference it instead of hardcoding a literal 6. Must equal
+  /// `sixBySix.runeCount`.
+  static const int chapter1RuneCount = 6;
+
+  /// Number of distinct rune values (1..runeCount) legal on this board.
+  ///
+  /// Defaults to `dimensions.cols`, which is the correct value for every
+  /// square sudoku board (6×6 → 6, 9×9 → 9). Making the count an explicit,
+  /// named concept (instead of `dimensions.cols` sprinkled at call sites) is
+  /// the first step toward a future `BoardConfig`; see
+  /// dev_notes/fable_step0_inventory_result.md.
+  int get runeCount {
+    assert(
+      _explicitRuneCount == null || _explicitRuneCount == dimensions.cols,
+      'runeCount ($_explicitRuneCount) must equal dimensions.cols '
+      '(${dimensions.cols}) for a square sudoku board.',
+    );
+    return _explicitRuneCount ?? dimensions.cols;
+  }
+
+  int get maxValue => runeCount; // 1..maxValue are legal values.
 
   // ---- Live-constraint validation -----------------------------------------
 

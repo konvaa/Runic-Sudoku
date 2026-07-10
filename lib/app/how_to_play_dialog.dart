@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../games/runic_sudoku/runic_sudoku_rules.dart';
+
 /// Shows the informational "How to Play" modal (Phase: UX fix 4).
 ///
 /// Purely informational — a few swipeable cards, no interactive tutorial, no game
@@ -24,8 +26,11 @@ const List<_HowToPlayCard> _cards = [
   _HowToPlayCard(
     Icons.grid_4x4,
     'One rune per row, column and box',
-    'Place each of the 6 rune symbols exactly once in every row, column, and '
-        'carved section. Logic only — no guessing needed.',
+    // Rune count is templated from the Chapter 1 constant (not a literal) so
+    // the copy can become chapter-aware later. Rendered text is unchanged.
+    'Place each of the ${RunicSudokuRules.chapter1RuneCount} rune symbols '
+        'exactly once in every row, column, and carved section. Logic only — '
+        'no guessing needed.',
   ),
   _HowToPlayCard(
     Icons.touch_app_outlined,

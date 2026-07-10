@@ -107,11 +107,12 @@ class PuzzleGenerator {
     }
 
     throw StateError(
-      'Failed to generate a ${target.token} puzzle within $maxAttempts attempts. '
-      'Deep on 6×6 is reachable but costly (near-minimal puzzles, '
-      'complexity >= ${DifficultyTuning.complexityTrickyMax}); it typically needs '
-      '~30–65 attempts, so raise maxAttempts (the MVP pre-generates Deep offline). '
-      'Quick/Normal/Tricky normally succeed in ~1 attempt.',
+      'Failed to generate a ${target.token} puzzle within $maxAttempts '
+      'attempts on a ${dimensions.toToken()} board '
+      '(box ${boxShape.toToken()}). Deep lives at near-minimal puzzles '
+      '(complexity >= ${DifficultyTuning.complexityTrickyMax}) and can need '
+      'far more attempts than the other labels — raise maxAttempts or '
+      'pre-generate offline (see tool/generate_level_pool.dart).',
     );
   }
 

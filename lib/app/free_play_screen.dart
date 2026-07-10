@@ -18,6 +18,11 @@ const String freePlaySaveLevelId = 'active_freeplay';
 
 /// Generation attempt budgets for on-demand Free Play. Deep needs the most
 /// headroom because the Free Play guardrails reject more near-minimal puzzles.
+///
+/// NOTE(chapter-system): these budgets are tuned for the 6×6 board. Once the
+/// board becomes configurable (BoardConfig through the isolate payload — a
+/// medium-risk item in dev_notes/fable_step0_inventory_result.md), key this
+/// map by (board config, label) and re-measure per board.
 const Map<String, int> _freePlayMaxAttempts = {
   'Quick': 200,
   'Normal': 200,

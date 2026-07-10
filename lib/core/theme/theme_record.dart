@@ -20,6 +20,12 @@ class ThemeRecord {
   final Color boxBorder;
 
   /// Id of the symbol set this theme prefers (resolved by ThemeManager).
+  ///
+  /// NOTE(chapter-system): both built-in themes currently point at
+  /// 'elder_futhark_6', a 6-symbol set sized for the 6×6 board. A larger board
+  /// needs a set with >= runeCount symbols (enforced at screen load by
+  /// `RunicSudokuSymbolValidation.requireSymbolCount`); per-board symbol-set
+  /// selection is future work (see dev_notes/fable_step0_inventory_result.md).
   final String symbolSetId;
 
   const ThemeRecord({
