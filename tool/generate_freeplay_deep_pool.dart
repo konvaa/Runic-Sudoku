@@ -12,6 +12,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/solver/difficulty_constants.dart';
 
@@ -20,7 +21,8 @@ const int maxAttemptsPerPuzzle = 2500;
 const String outPath = 'assets/freeplay/deep_pool.json';
 
 void main() {
-  final generator = PuzzleGenerator();
+  // Deep Free Play pool: explicitly the 6×6 board (matches the shipped asset).
+  final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
   final puzzles = <Map<String, dynamic>>[];
   final seenGivens = <String>{};
   final rejections = <int>[];

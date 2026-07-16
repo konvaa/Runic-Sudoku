@@ -6,17 +6,19 @@ import 'package:flutter/foundation.dart' show compute, visibleForTesting;
 
 import '../../../core/profile/app_controller.dart';
 import '../../../core/save/local_save_repository.dart' show SaveStore;
+import '../board_config.dart';
 import '../generator/level_data.dart';
 import '../generator/puzzle_generator.dart';
 import '../solver/difficulty_constants.dart';
 import 'deep_pool.dart';
 
-/// Top-level isolate entry: generate one guarded Deep puzzle. Returns its level
+/// Top-level isolate entry: generate one guarded Deep puzzle for the board
+/// described by [boardJson] (a `BoardConfig.toJson()` map). Returns its level
 /// JSON, or null if generation failed. Runs via [compute] so it never touches
 /// the UI thread.
-Map<String, dynamic>? generateOneDeepLevelJson(int _) {
+Map<String, dynamic>? generateOneDeepLevelJson(Map<String, dynamic> boardJson) {
   try {
-    final r = PuzzleGenerator().generate(
+    final r = PuzzleGenerator(board: BoardConfig.fromJson(boardJson)).generate(
       target: DifficultyLabel.deep,
       maxAttempts: 1500,
       freePlay: true,
@@ -38,11 +40,30 @@ Map<String, dynamic>? generateOneDeepLevelJson(int _) {
 /// low-end devices) — [nextPuzzle] only reads the cache/pool, so it is instant.
 class DeepFreePlayCache {
   static const int maxCacheSize = 15;
-  static const String cacheKey = 'deep_freeplay_cache';
+
+  /// Persisted key of the rolling cache for [BoardConfig.sixBySix] — the only
+  /// board shipped today. Must equal `cacheKeyFor(BoardConfig.sixBySix)`.
+  static const String cacheKey = 'deep_freeplay_cache_6x6';
+
+  /// Persisted rolling-cache key for [board], namespaced per board config so a
+  /// future second board never interleaves into another board's cache.
+  static String cacheKeyFor(BoardConfig board) =>
+      'deep_freeplay_cache_${board.dimensions.toToken()}';
+
+  /// The pre-chapter-system, unnamespaced key. Its contents are treated as
+  /// orphaned (NOT migrated): the rolling cache is regenerable supply, not
+  /// player progress — the bundled pool still serves Deep instantly while the
+  /// namespaced cache refills. [load] removes the stale entry once.
+  static const String legacyCacheKey = 'deep_freeplay_cache';
 
   final SaveStore store;
   final AppController appController;
   final List<DeepPuzzleEntry> bundledPool;
+
+  /// The board this cache serves. Defaults to Chapter 1's 6×6 board so the
+  /// existing wiring (and tests) stay unchanged.
+  final BoardConfig board;
+
   final Future<Map<String, dynamic>?> Function() _generate;
   final Random _rng;
 
@@ -56,15 +77,23 @@ class DeepFreePlayCache {
     required this.store,
     required this.appController,
     required this.bundledPool,
+    this.board = BoardConfig.sixBySix,
     Future<Map<String, dynamic>?> Function()? generate,
     Random? rng,
-  })  : _generate = generate ?? (() => compute(generateOneDeepLevelJson, 0)),
+  })  : _generate = generate ??
+            (() => compute(generateOneDeepLevelJson, board.toJson())),
         _rng = rng ?? Random();
+
+  /// This instance's persisted cache key (namespaced by [board]).
+  String get storeKey => cacheKeyFor(board);
 
   /// Loads the persisted cache from the store. Safe to call repeatedly.
   Future<void> load() async {
     if (_loaded) return;
-    final raw = await store.get(cacheKey);
+    // One-time cleanup of the pre-namespacing key (orphaned, regenerable data;
+    // removing a missing key is a no-op).
+    await store.remove(legacyCacheKey);
+    final raw = await store.get(storeKey);
     if (raw != null) {
       try {
         final list = jsonDecode(raw) as List;
@@ -177,7 +206,7 @@ class DeepFreePlayCache {
 
   Future<void> _persistCache() async {
     await store.put(
-      cacheKey,
+      storeKey,
       jsonEncode([for (final e in _cache) e.toJson()]),
     );
   }

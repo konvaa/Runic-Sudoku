@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/solver/difficulty_constants.dart';
 
@@ -46,7 +47,7 @@ const double _maxRejectsP95 = 100.0;
 void main(List<String> args) {
   final freePlay = args.contains('freeplay');
   final budgets = freePlay ? _maxAttemptsFreePlay : _maxAttempts;
-  final generator = PuzzleGenerator();
+  final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
   final rng = Random(20260618);
 
   stdout.writeln(freePlay

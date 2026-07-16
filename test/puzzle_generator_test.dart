@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/difficulty_scorer.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/full_grid_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/level_data.dart';
@@ -32,7 +33,7 @@ void main() {
   });
 
   group('puzzle generation (complexity-based model)', () {
-    final generator = PuzzleGenerator(dimensions: dims, boxShape: box);
+    final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
     final uniqueness =
         FastUniquenessSolver(dimensions: dims, boxShape: box);
 
@@ -85,7 +86,7 @@ void main() {
 
   group('level export / import', () {
     test('round-trips solution_grid and given_cells', () {
-      final generator = PuzzleGenerator(dimensions: dims, boxShape: box);
+      final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
       final result = generator.generate(
           target: DifficultyLabel.normal, seed: 123, maxAttempts: 400);
       final restored = LevelData.fromJson(result.level.toJson());

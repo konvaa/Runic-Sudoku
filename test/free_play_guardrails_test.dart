@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/free_play_guardrails.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/manual_puzzle.dart';
@@ -129,7 +130,7 @@ void main() {
   });
 
   group('Free Play generation honors the guardrails', () {
-    final generator = PuzzleGenerator();
+    final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
 
     void check(DifficultyLabel label, int count, int maxAttempts) {
       for (var i = 0; i < count; i++) {

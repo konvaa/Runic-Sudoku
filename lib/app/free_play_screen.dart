@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show compute;
 import 'package:flutter/material.dart';
 
+import '../games/runic_sudoku/board_config.dart';
 import '../games/runic_sudoku/chapter_theme.dart';
 import '../games/runic_sudoku/generator/level_data.dart';
 import '../games/runic_sudoku/generator/puzzle_generator.dart';
@@ -30,12 +31,26 @@ const Map<String, int> _freePlayMaxAttempts = {
   'Deep': 1200,
 };
 
+/// Builds the serializable isolate payload for [generateFreePlayLevelJson]:
+/// board identity + difficulty label. Today only the 6×6 board is ever sent;
+/// carrying the board explicitly means a future Chapter 2 Free Play mode does
+/// not need to touch this `compute()` boundary again.
+Map<String, dynamic> freePlayGenerationMessage(
+  BoardConfig board,
+  DifficultyLabel label,
+) =>
+    {'board': board.toJson(), 'label': label.token};
+
 /// Runs in a background isolate (via [compute]) so generation never janks the UI
-/// thread. Returns the level JSON, or null if generation failed.
-Map<String, dynamic>? generateFreePlayLevelJson(String token) {
+/// thread. [message] is built by [freePlayGenerationMessage]. Returns the level
+/// JSON, or null if generation failed.
+Map<String, dynamic>? generateFreePlayLevelJson(Map<String, dynamic> message) {
+  final board =
+      BoardConfig.fromJson(message['board'] as Map<String, dynamic>);
+  final token = message['label'] as String;
   final label = DifficultyLabel.fromToken(token);
   try {
-    final result = PuzzleGenerator().generate(
+    final result = PuzzleGenerator(board: board).generate(
       target: label,
       maxAttempts: _freePlayMaxAttempts[token] ?? 400,
       freePlay: true,
@@ -51,7 +66,9 @@ Map<String, dynamic>? generateFreePlayLevelJson(String token) {
 /// slot id (`freeplay_<label>`); the screen loads them `fresh`, so the slot is
 /// only an app-pause scratch buffer and never resumes a stale puzzle.
 Future<ManualPuzzle?> generateFreePlayPuzzle(DifficultyLabel label) async {
-  final json = await compute(generateFreePlayLevelJson, label.token);
+  // Free Play is 6×6-only today; the board travels explicitly in the payload.
+  final json = await compute(generateFreePlayLevelJson,
+      freePlayGenerationMessage(BoardConfig.sixBySix, label));
   if (json == null) return null;
   final data = LevelData.fromJson(json);
   return ManualPuzzle(

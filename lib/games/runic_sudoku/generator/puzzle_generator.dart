@@ -3,6 +3,7 @@ import 'dart:math';
 import '../../../grid/box_shape.dart';
 import '../../../grid/grid_coordinate.dart';
 import '../../../grid/grid_dimensions.dart';
+import '../board_config.dart';
 import '../solver/difficulty_constants.dart';
 import '../solver/fast_uniqueness_solver.dart';
 import '../solver/human_like_solver.dart';
@@ -39,8 +40,11 @@ class GenerationResult {
 /// pre-generates Deep offline instead (see tool/generate_level_pool.dart). If the
 /// band is not reached within [maxAttempts], this throws.
 ///
-/// Parametric over grid size / box shape (defaults to 6×6 / 2×3). Pure Dart.
+/// Parametric over the board via a REQUIRED [BoardConfig] — there is no
+/// implicit default board, so every call site is an explicit, compiler-checked
+/// decision (chapter-system refactor, Batch 2). Pure Dart.
 class PuzzleGenerator {
+  final BoardConfig board;
   final GridDimensions dimensions;
   final BoxShape boxShape;
 
@@ -49,16 +53,18 @@ class PuzzleGenerator {
   final HumanLikeSolver _human;
   final DifficultyScorer _scorer;
 
-  PuzzleGenerator({
-    this.dimensions = const GridDimensions(rows: 6, cols: 6),
-    this.boxShape = const BoxShape(rows: 2, cols: 3),
-  })  : _full =
-            FullGridGenerator(dimensions: dimensions, boxShape: boxShape),
-        _uniqueness =
-            FastUniquenessSolver(dimensions: dimensions, boxShape: boxShape),
-        _human =
-            HumanLikeSolver(dimensions: dimensions, boxShape: boxShape),
-        _scorer = const DifficultyScorer();
+  PuzzleGenerator({required this.board})
+      : dimensions = board.dimensions,
+        boxShape = board.boxShape,
+        _full = FullGridGenerator(
+            dimensions: board.dimensions, boxShape: board.boxShape),
+        _uniqueness = FastUniquenessSolver(
+            dimensions: board.dimensions, boxShape: board.boxShape),
+        _human = HumanLikeSolver(
+            dimensions: board.dimensions, boxShape: board.boxShape),
+        _scorer = const DifficultyScorer() {
+    board.debugAssertValid();
+  }
 
   /// Generates a puzzle whose candidate_complexity falls in [target]'s band.
   ///

@@ -15,6 +15,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/solver/difficulty_constants.dart';
 
@@ -28,7 +29,8 @@ const _plan = <(DifficultyLabel, int, int)>[
 ];
 
 void main() {
-  final generator = PuzzleGenerator();
+  // Chapter 1 pool: explicitly the 6×6 board (matches the shipped asset).
+  final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
   final levels = <Map<String, dynamic>>[];
 
   for (final (label, count, maxAttempts) in _plan) {

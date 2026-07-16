@@ -7,6 +7,7 @@
 // (reserved for larger grids); the tool reports that plainly rather than hiding
 // it. Nothing here is part of the app build.
 
+import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/difficulty_scorer.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/solver/difficulty_constants.dart';
@@ -19,7 +20,7 @@ const samples = 10;
 const maxAttempts = 60;
 
 void main() {
-  final generator = PuzzleGenerator(dimensions: dims, boxShape: box);
+  final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
   const scorer = DifficultyScorer();
 
   print('Per-label generatability — complexity-based model, ${dims.toToken()}.');
