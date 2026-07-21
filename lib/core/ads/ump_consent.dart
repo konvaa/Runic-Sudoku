@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Google User Messaging Platform (UMP) GDPR consent flow (Phase 4).
@@ -15,24 +16,40 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 class UmpConsent {
   const UmpConsent._();
 
+  /// Initialises the Mobile Ads SDK. Test seam ONLY — production code must
+  /// never reassign this. It exists so unit tests can verify the consent gate
+  /// (no SDK init unless `canRequestAds() == true`) without the platform SDK;
+  /// see `test/ump_consent_gating_test.dart`. The app's single real
+  /// `MobileAds.instance.initialize()` call site lives in this default value.
+  @visibleForTesting
+  static Future<void> Function() initializeMobileAds =
+      () => MobileAds.instance.initialize();
+
   /// Runs the consent flow, then initialises the Mobile Ads SDK — but only
   /// when [ConsentInformation.canRequestAds] allows ad requests.
   ///
   /// Returns true when the SDK was initialised (ads may be loaded), false when
-  /// ads must stay disabled for this session. Never throws: consent-flow
-  /// errors are swallowed and the outcome is decided solely by
-  /// `canRequestAds()`, which may still be true from consent stored in a
-  /// previous session (e.g. an offline relaunch after consent was given).
+  /// ads must stay disabled for this session. Never throws — fails CLOSED:
+  /// consent-flow errors are swallowed and the outcome is decided solely by
+  /// `canRequestAds()` (which may still be true from consent stored in a
+  /// previous session, e.g. an offline relaunch after consent was given); if
+  /// even the consent state cannot be determined, or SDK init fails, this
+  /// reports false so the caller wires the no-ads path.
   static Future<bool> gatherConsentThenInitialize() async {
     try {
       await _gatherConsent();
     } catch (_) {
       // Ignore: `canRequestAds()` below still decides the outcome.
     }
-    final canRequestAds = await ConsentInformation.instance.canRequestAds();
-    if (!canRequestAds) return false;
-    await MobileAds.instance.initialize();
-    return true;
+    try {
+      final canRequestAds = await ConsentInformation.instance.canRequestAds();
+      if (!canRequestAds) return false;
+      await initializeMobileAds();
+      return true;
+    } catch (_) {
+      // Fail closed: unknown consent state (or failed SDK init) → no ads.
+      return false;
+    }
   }
 
   /// Whether the app must offer a privacy-options entry point (UMP requires
