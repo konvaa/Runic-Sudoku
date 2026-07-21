@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/ads/ump_consent.dart';
 import '../core/purchases/purchase_service.dart';
 import 'app.dart';
 
@@ -16,11 +17,29 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _busy = false;
   bool _removeAdsOwned = false;
+  bool _privacyOptionsRequired = false;
 
   @override
   void initState() {
     super.initState();
     _refreshOwnership();
+    _refreshPrivacyOptionsRequirement();
+  }
+
+  /// GDPR (UMP): EEA users must keep an entry point to revisit their consent.
+  /// The row is shown only when UMP reports it is required.
+  Future<void> _refreshPrivacyOptionsRequirement() async {
+    final isRequired = await UmpConsent.isPrivacyOptionsRequired();
+    if (mounted) setState(() => _privacyOptionsRequired = isRequired);
+  }
+
+  Future<void> _showPrivacyOptions() async {
+    setState(() => _busy = true);
+    // Resolves when the form is dismissed. A changed choice takes effect via
+    // the canRequestAds() checks before each ad load (full rewire on restart).
+    await UmpConsent.showPrivacyOptionsForm();
+    if (!mounted) return;
+    setState(() => _busy = false);
   }
 
   Future<void> _refreshOwnership() async {
@@ -126,6 +145,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: _busy ? null : _restore,
                 child: const Text('Restore purchases'),
               ),
+              if (_privacyOptionsRequired) ...[
+                const Divider(height: 32),
+                const _SectionHeader('Privacy'),
+                ListTile(
+                  title: const Text('Privacy settings'),
+                  subtitle: const Text('Review or change your ads consent'),
+                  enabled: !_busy,
+                  onTap: _showPrivacyOptions,
+                ),
+              ],
             ],
           ),
         ),

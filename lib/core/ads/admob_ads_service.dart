@@ -29,9 +29,14 @@ class AdUnitIds {
 /// - If an ad is not ready, the call returns gracefully ([AdStatus.notAvailable]
 ///   / [AdStatus.failed]) and never blocks the UI.
 ///
-/// Requires [MobileAds.instance.initialize] to have completed first (see
-/// `UmpConsent.gatherConsentThenInitialize`). Falls back cleanly: every public
-/// method that can't proceed returns a non-throwing result.
+/// Requires [MobileAds.instance.initialize] to have completed first — which
+/// happens only when UMP consent allows ad requests (see
+/// `UmpConsent.gatherConsentThenInitialize`; `main.dart` wires the no-op
+/// service otherwise). Every load additionally re-checks
+/// `ConsentInformation.canRequestAds()`, so a consent withdrawal (privacy
+/// options form in Settings) stops new ad requests without an app restart.
+/// Falls back cleanly: every public method that can't proceed returns a
+/// non-throwing result.
 class AdMobAdsService implements AdsService {
   /// Returns true when interstitials should be suppressed (Remove Ads owned).
   final bool Function()? interstitialsSuppressed;
@@ -43,6 +48,18 @@ class AdMobAdsService implements AdsService {
 
   bool get _suppressed => interstitialsSuppressed?.call() ?? false;
 
+  /// UMP consent gate, re-checked before EVERY ad request: consent can change
+  /// mid-session (privacy options form in Settings), and no request may leave
+  /// the app unless `canRequestAds()` is true at that moment. Returns false
+  /// when the consent state cannot be determined.
+  static Future<bool> _canRequestAds() async {
+    try {
+      return await ConsentInformation.instance.canRequestAds();
+    } catch (_) {
+      return false; // unknown consent state — do not request ads
+    }
+  }
+
   /// Pre-fetch both formats. Call once after [MobileAds] is initialized.
   void preload() {
     _loadInterstitial();
@@ -51,8 +68,9 @@ class AdMobAdsService implements AdsService {
 
   // ---- Interstitial -------------------------------------------------------
 
-  void _loadInterstitial() {
+  Future<void> _loadInterstitial() async {
     if (_suppressed) return; // never pre-fetch when Remove Ads is owned
+    if (!await _canRequestAds()) return; // UMP consent gate
     InterstitialAd.load(
       adUnitId: AdUnitIds.interstitial,
       request: const AdRequest(),
@@ -96,7 +114,8 @@ class AdMobAdsService implements AdsService {
 
   // ---- Rewarded -----------------------------------------------------------
 
-  void _loadRewarded() {
+  Future<void> _loadRewarded() async {
+    if (!await _canRequestAds()) return; // UMP consent gate
     RewardedAd.load(
       adUnitId: AdUnitIds.rewarded,
       request: const AdRequest(),

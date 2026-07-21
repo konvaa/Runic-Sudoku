@@ -79,21 +79,29 @@ Future<void> main() async {
   await deepCache.load();
   if (deepCache.cacheSize < 5) deepCache.startRefill();
 
-  // ---- 2 + 3. UMP consent → AdMob init → real ads (Phase 4). Falls back to the
-  // no-op service if anything goes wrong, so ads issues never block the game.
+  // ---- 2 + 3. UMP consent → AdMob init → real ads (Phase 4). The Mobile Ads
+  // SDK is initialised and real ads are wired ONLY when the consent flow ends
+  // with canRequestAds() == true; otherwise — and on any error — the no-op
+  // service is used, so no ad request ever leaves the app without consent and
+  // ads issues never block the game.
   AdsService ads;
   try {
-    await UmpConsent.gatherConsentThenInitialize();
-    MobileAds.instance.updateRequestConfiguration(
-      // TODO: add your test device's GAID so you see real test ads on it.
-      // Find it in: Android Settings → Google → Ads → Advertising ID.
-      RequestConfiguration(testDeviceIds: const ['2599f83f-cbd7-4507-bc79-ec834e09e4bb']),
-    );
-    final admob = AdMobAdsService(
-      interstitialsSuppressed: () => appController.removeAdsPurchased,
-    );
-    admob.preload();
-    ads = admob;
+    final adsAllowed = await UmpConsent.gatherConsentThenInitialize();
+    if (adsAllowed) {
+      MobileAds.instance.updateRequestConfiguration(
+        // TODO: add your test device's GAID so you see real test ads on it.
+        // Find it in: Android Settings → Google → Ads → Advertising ID.
+        RequestConfiguration(
+            testDeviceIds: const ['2599f83f-cbd7-4507-bc79-ec834e09e4bb']),
+      );
+      final admob = AdMobAdsService(
+        interstitialsSuppressed: () => appController.removeAdsPurchased,
+      );
+      admob.preload();
+      ads = admob;
+    } else {
+      ads = const NoopAdsService();
+    }
   } catch (_) {
     ads = const NoopAdsService();
   }
