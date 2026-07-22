@@ -1,10 +1,17 @@
 // Generator audit / diagnostic (pure Dart — run from the project root with:
-//   dart run tool/generator_audit.dart
+//   dart run tool/generator_audit.dart               (6×6 default board)
+//   dart run tool/generator_audit.dart 9x9           (9×9 feasibility board)
+//
+// Optional args: `freeplay` (generate with FreePlayGuardrails enabled) and
+// count=N (puzzles per label, default 200), e.g.:
+//   dart run tool/generator_audit.dart 9x9 count=40
 //
 // Generates a batch of puzzles per difficulty label and reports generation
 // speed, rejection rate, puzzle-quality distributions, duplicate rate, and a
 // Free-Play viability verdict. It also writes 5 random samples per label to
-// tool/audit_samples.json for manual inspection.
+// tool/audit_samples.json (6×6) / tool/audit_samples_<size>.json (other
+// boards — the 6×6 file is never overwritten by a non-6×6 run) for manual
+// inspection.
 //
 // DIAGNOSTIC ONLY — it does not modify any production code; it just calls the
 // existing PuzzleGenerator. Deep is the slow label; 200 Deep puzzles may take a
@@ -17,8 +24,19 @@ import 'dart:math';
 import 'package:runic_sudoku/games/runic_sudoku/board_config.dart';
 import 'package:runic_sudoku/games/runic_sudoku/generator/puzzle_generator.dart';
 import 'package:runic_sudoku/games/runic_sudoku/solver/difficulty_constants.dart';
+import 'package:runic_sudoku/grid/box_shape.dart';
+import 'package:runic_sudoku/grid/grid_dimensions.dart';
 
-const int perLabel = 200; // puzzles generated per label
+/// 9×9 feasibility board (chapter-system spike). Deliberately defined HERE and
+/// not in lib/ so no shipped code path can reach it; the only 9×9 entry points
+/// are the dev tools' explicit `9x9` argument.
+const BoardConfig nineByNine = BoardConfig(
+  dimensions: GridDimensions(rows: 9, cols: 9),
+  boxShape: BoxShape(rows: 3, cols: 3),
+  runeCount: 9,
+);
+
+const int defaultPerLabel = 200; // puzzles generated per label
 const int sampleCount = 5; // samples exported per label
 
 // Generation attempt budget per label (Deep needs many more; offline cost).
@@ -46,10 +64,14 @@ const double _maxRejectsP95 = 100.0;
 
 void main(List<String> args) {
   final freePlay = args.contains('freeplay');
+  final board = args.contains('9x9') ? nineByNine : BoardConfig.sixBySix;
+  final perLabel = _intArg(args, 'count=', defaultPerLabel);
   final budgets = freePlay ? _maxAttemptsFreePlay : _maxAttempts;
-  final generator = PuzzleGenerator(board: BoardConfig.sixBySix);
+  final generator = PuzzleGenerator(board: board);
   final rng = Random(20260618);
 
+  stdout.writeln('** BOARD: ${board.dimensions.toToken()} '
+      '(box ${board.boxShape.toToken()}, ${board.runeCount} runes) **');
   stdout.writeln(freePlay
       ? '** FREE PLAY MODE: generating with FreePlayGuardrails enabled **\n'
       : '** CAMPAIGN MODE (no guardrails) **\n');
@@ -138,8 +160,10 @@ void main(List<String> args) {
     );
   }
 
-  // ---- write samples ----
-  final file = File('tool/audit_samples.json');
+  // ---- write samples (per-board file so the 6×6 file is never clobbered) ----
+  final file = File(board == BoardConfig.sixBySix
+      ? 'tool/audit_samples.json'
+      : 'tool/audit_samples_${board.dimensions.toToken()}.json');
   file.writeAsStringSync(const JsonEncoder.withIndent('  ').convert(samples));
   stdout.writeln('Wrote samples to ${file.path}');
   stdout.writeln('');
@@ -217,6 +241,16 @@ class _LabelSummary {
     required this.rejectP95,
     required this.estAvg,
   });
+}
+
+int _intArg(List<String> args, String prefix, int fallback) {
+  for (final a in args) {
+    if (a.startsWith(prefix)) {
+      final v = int.tryParse(a.substring(prefix.length));
+      if (v != null) return v;
+    }
+  }
+  return fallback;
 }
 
 double _avg(List<double> xs) =>
