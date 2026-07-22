@@ -73,10 +73,36 @@ void main() {
     expect(find.byKey(_appKey), findsOneWidget);
   });
 
+  // Regression guard: an `async => throw` closure is inferred as returning
+  // Future<Never>; calling .timeout() directly on that future used to fail
+  // its covariant runtime check before attaching a listener, leaving the
+  // original error to escape as an uncaught zone error (this test then fails
+  // even though the widget's own expectations pass). See
+  // _gatherConsentNormalised in app_bootstrap.dart.
   testWidgets('fails closed when the consent flow throws', (tester) async {
     bool? receivedAllowed;
     await tester.pumpWidget(AppBootstrap(
       gatherConsent: () async => throw StateError('consent unavailable'),
+      buildAdsService: (allowed) {
+        receivedAllowed = allowed;
+        return const NoopAdsService();
+      },
+      buildApp: (ads) => const SizedBox(key: _appKey),
+    ));
+
+    await tester.pump();
+    await tester.pump();
+
+    expect(receivedAllowed, isFalse);
+    expect(find.byKey(_appKey), findsOneWidget);
+  });
+
+  testWidgets('fails closed when the consent flow throws synchronously',
+      (tester) async {
+    bool? receivedAllowed;
+    await tester.pumpWidget(AppBootstrap(
+      // Non-async closure: throws at invocation instead of erroring a future.
+      gatherConsent: () => throw StateError('sync consent failure'),
       buildAdsService: (allowed) {
         receivedAllowed = allowed;
         return const NoopAdsService();

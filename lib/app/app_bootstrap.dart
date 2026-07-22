@@ -73,11 +73,31 @@ class _AppBootstrapState extends State<AppBootstrap> {
     });
   }
 
+  /// Runs [AppBootstrap.gatherConsent] normalised into a future that is
+  /// ALWAYS a well-typed `Future<bool>` with the original future listened to.
+  ///
+  /// Why not call `.timeout()` on the raw closure result: a closure like
+  /// `() async => throw ...` is inferred by Dart as returning `Future<Never>`,
+  /// and calling the class-generic `Future.timeout` on that receiver fails
+  /// its covariant runtime parameter check (`() => false` is not a
+  /// `FutureOr<Never> Function()`) at method ENTRY — before `timeout`
+  /// attaches its internal error listener (dart:async future_impl.dart: the
+  /// `this.then(..., onError:)` attach is the last step of the body). The
+  /// TypeError itself lands in the caller's catch, but the original errored
+  /// future is left with NO listener, so its error is re-reported to the
+  /// Zone as uncaught — crashing tests and reaching FlutterError in the app.
+  /// (Same mechanism family as dart-lang/sdk#42525.)
+  ///
+  /// The declared `Future<bool>` return type pins the runtime future type,
+  /// and the `await` inside guarantees the closure's own future always has a
+  /// listener; a synchronously-throwing closure is likewise captured into
+  /// the returned future here instead of relying on the caller's try block.
+  Future<bool> _gatherConsentNormalised() async => await widget.gatherConsent();
+
   Future<void> _bootstrap() async {
     var adsAllowed = false;
     try {
-      adsAllowed = await widget
-          .gatherConsent()
+      adsAllowed = await _gatherConsentNormalised()
           .timeout(widget.consentTimeout, onTimeout: () => false);
     } catch (_) {
       adsAllowed = false; // fail closed: no consent signal → no ads
