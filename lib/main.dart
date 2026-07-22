@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'app/app.dart';
+import 'app/app_bootstrap.dart';
 import 'core/ads/admob_ads_service.dart';
 import 'core/ads/ads_service.dart';
 import 'core/ads/noop_ads_service.dart';
@@ -79,34 +80,7 @@ Future<void> main() async {
   await deepCache.load();
   if (deepCache.cacheSize < 5) deepCache.startRefill();
 
-  // ---- 2 + 3. UMP consent → AdMob init → real ads (Phase 4). The Mobile Ads
-  // SDK is initialised and real ads are wired ONLY when the consent flow ends
-  // with canRequestAds() == true; otherwise — and on any error — the no-op
-  // service is used, so no ad request ever leaves the app without consent and
-  // ads issues never block the game.
-  AdsService ads;
-  try {
-    final adsAllowed = await UmpConsent.gatherConsentThenInitialize();
-    if (adsAllowed) {
-      MobileAds.instance.updateRequestConfiguration(
-        // TODO: add your test device's GAID so you see real test ads on it.
-        // Find it in: Android Settings → Google → Ads → Advertising ID.
-        RequestConfiguration(
-            testDeviceIds: const ['2599f83f-cbd7-4507-bc79-ec834e09e4bb']),
-      );
-      final admob = AdMobAdsService(
-        interstitialsSuppressed: () => appController.removeAdsPurchased,
-      );
-      admob.preload();
-      ads = admob;
-    } else {
-      ads = const NoopAdsService();
-    }
-  } catch (_) {
-    ads = const NoopAdsService();
-  }
-
-  // ---- 4. Billing init + entitlement sync (so Remove Ads survives reinstall).
+  // ---- 2. Billing init + entitlement sync (so Remove Ads survives reinstall).
   PurchaseService purchases;
   try {
     final billing = PlayBillingService();
@@ -117,19 +91,43 @@ Future<void> main() async {
   }
   await appController.syncRemoveAdsEntitlement(purchases);
 
-  // ---- 5. Run the app UI.
-  final services = AppServices(
-    save: save,
-    analytics: analytics,
-    ads: ads,
-    purchases: purchases,
-    themeManager: ThemeManager(),
-    appController: appController,
-    levelPool: levelPool,
-    progression: progression,
-    progressionController: progressionController,
-    deepCache: deepCache,
-  );
-
-  runApp(RunicSudokuApp(services: services));
+  // ---- 3. Run the app. UMP consent → AdMob init → real ads (Phase 4) run
+  // inside AppBootstrap, only AFTER the first Flutter frame: the consent form
+  // triggered before the first frame rendered invisibly over the blank
+  // Activity on some devices (confirmed on Xiaomi 13T Pro, Android 16). The
+  // Mobile Ads SDK is initialised and real ads are wired ONLY when the
+  // consent flow ends with canRequestAds() == true; otherwise — and on any
+  // error or timeout — the no-op service is used, so no ad request ever
+  // leaves the app without consent and ads issues never block the game.
+  runApp(AppBootstrap(
+    gatherConsent: UmpConsent.gatherConsentThenInitialize,
+    buildAdsService: (adsAllowed) {
+      if (!adsAllowed) return const NoopAdsService();
+      MobileAds.instance.updateRequestConfiguration(
+        // TODO: add your test device's GAID so you see real test ads on it.
+        // Find it in: Android Settings → Google → Ads → Advertising ID.
+        RequestConfiguration(
+            testDeviceIds: const ['2599f83f-cbd7-4507-bc79-ec834e09e4bb']),
+      );
+      final admob = AdMobAdsService(
+        interstitialsSuppressed: () => appController.removeAdsPurchased,
+      );
+      admob.preload();
+      return admob;
+    },
+    buildApp: (AdsService ads) => RunicSudokuApp(
+      services: AppServices(
+        save: save,
+        analytics: analytics,
+        ads: ads,
+        purchases: purchases,
+        themeManager: ThemeManager(),
+        appController: appController,
+        levelPool: levelPool,
+        progression: progression,
+        progressionController: progressionController,
+        deepCache: deepCache,
+      ),
+    ),
+  ));
 }
