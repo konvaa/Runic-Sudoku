@@ -25,6 +25,14 @@ import '../core/ads/noop_ads_service.dart';
 /// leaving the user stuck on the boot screen. A late consent choice is still
 /// persisted by UMP and is honoured on the next launch.
 class AppBootstrap extends StatefulWidget {
+  /// Default for [consentTimeout] — the single place to retune it.
+  ///
+  /// Generous on purpose: a careful reader may spend well over a minute in
+  /// the consent form (purposes, vendor list, "manage options") before
+  /// choosing. This bound exists to catch a genuinely stuck consent flow,
+  /// not to race the user.
+  static const Duration defaultConsentTimeout = Duration(seconds: 90);
+
   /// Runs the consent flow; resolves true when ads may be requested
   /// (production: `UmpConsent.gatherConsentThenInitialize`).
   final Future<bool> Function() gatherConsent;
@@ -45,7 +53,7 @@ class AppBootstrap extends StatefulWidget {
     required this.gatherConsent,
     required this.buildAdsService,
     required this.buildApp,
-    this.consentTimeout = const Duration(seconds: 15),
+    this.consentTimeout = defaultConsentTimeout,
   });
 
   @override

@@ -42,11 +42,14 @@ void main() {
 
   testWidgets('fails closed when the consent flow never resolves (timeout)',
       (tester) async {
+    // Pin the shipped default so a retune is a conscious, reviewed change.
+    expect(AppBootstrap.defaultConsentTimeout, const Duration(seconds: 90));
+
     bool? receivedAllowed;
     final never = Completer<bool>();
     await tester.pumpWidget(AppBootstrap(
+      // No consentTimeout override: this test exercises the real default.
       gatherConsent: () => never.future,
-      consentTimeout: const Duration(seconds: 5),
       buildAdsService: (allowed) {
         receivedAllowed = allowed;
         return const NoopAdsService();
@@ -57,8 +60,10 @@ void main() {
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    // Just before the timeout: still on the boot screen.
-    await tester.pump(const Duration(seconds: 4));
+    // Just before the default timeout: still on the boot screen. The widget
+    // test clock is fake (pump advances it instantly) — no real waiting.
+    await tester.pump(
+        AppBootstrap.defaultConsentTimeout - const Duration(seconds: 1));
     expect(find.byKey(_appKey), findsNothing);
 
     // Past the timeout: proceeds with ads disallowed.
