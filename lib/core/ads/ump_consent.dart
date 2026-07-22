@@ -85,7 +85,9 @@ class UmpConsent {
 
   static Future<void> _gatherConsent() {
     final completer = Completer<void>();
+
     final params = ConsentRequestParameters();
+
     ConsentInformation.instance.requestConsentInfoUpdate(
       params,
       () async {
