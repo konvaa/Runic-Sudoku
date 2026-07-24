@@ -1,8 +1,5 @@
 {
   "schema": "runic_sudoku_level_pool_v1",
-  "schema_version": 1,
-  "chapter_id": "c1",
-  "pool_version": 1,
   "note": "Pre-generated reference level pool for the 6x6 Runic Sudoku MVP. Each entry is the LevelData JSON plus estimated_solve_time (ms). Canonical data is solution_grid + given_cells; seed is debug-only.",
   "grid_size": "6x6",
   "box_shape": "2x3",
@@ -14,7 +11,6 @@
   },
   "levels": [
     {
-      "level_id": "rs_000",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -122,7 +118,6 @@
       "seed": 10131
     },
     {
-      "level_id": "rs_001",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -230,7 +225,6 @@
       "seed": 10262
     },
     {
-      "level_id": "rs_002",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -338,7 +332,6 @@
       "seed": 10393
     },
     {
-      "level_id": "rs_003",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -446,7 +439,6 @@
       "seed": 10524
     },
     {
-      "level_id": "rs_004",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -554,7 +546,6 @@
       "seed": 10655
     },
     {
-      "level_id": "rs_005",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -662,7 +653,6 @@
       "seed": 10786
     },
     {
-      "level_id": "rs_006",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -770,7 +760,6 @@
       "seed": 10917
     },
     {
-      "level_id": "rs_007",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -878,7 +867,6 @@
       "seed": 11048
     },
     {
-      "level_id": "rs_008",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -986,7 +974,6 @@
       "seed": 11179
     },
     {
-      "level_id": "rs_009",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1094,7 +1081,6 @@
       "seed": 11310
     },
     {
-      "level_id": "rs_010",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1202,7 +1188,6 @@
       "seed": 11441
     },
     {
-      "level_id": "rs_011",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1310,7 +1295,6 @@
       "seed": 11572
     },
     {
-      "level_id": "rs_012",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1418,7 +1402,6 @@
       "seed": 11703
     },
     {
-      "level_id": "rs_013",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1526,7 +1509,6 @@
       "seed": 11834
     },
     {
-      "level_id": "rs_014",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1634,7 +1616,6 @@
       "seed": 11965
     },
     {
-      "level_id": "rs_015",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1742,7 +1723,6 @@
       "seed": 12096
     },
     {
-      "level_id": "rs_016",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1850,7 +1830,6 @@
       "seed": 12227
     },
     {
-      "level_id": "rs_017",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -1958,7 +1937,6 @@
       "seed": 12358
     },
     {
-      "level_id": "rs_018",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2066,7 +2044,6 @@
       "seed": 12489
     },
     {
-      "level_id": "rs_019",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2174,7 +2151,6 @@
       "seed": 12620
     },
     {
-      "level_id": "rs_020",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2282,7 +2258,6 @@
       "seed": 10131
     },
     {
-      "level_id": "rs_021",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2390,7 +2365,6 @@
       "seed": 10262
     },
     {
-      "level_id": "rs_022",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2498,7 +2472,6 @@
       "seed": 10393
     },
     {
-      "level_id": "rs_023",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2606,7 +2579,6 @@
       "seed": 10524
     },
     {
-      "level_id": "rs_024",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2714,7 +2686,6 @@
       "seed": 10655
     },
     {
-      "level_id": "rs_025",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2822,7 +2793,6 @@
       "seed": 10786
     },
     {
-      "level_id": "rs_026",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -2930,7 +2900,6 @@
       "seed": 10917
     },
     {
-      "level_id": "rs_027",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3038,7 +3007,6 @@
       "seed": 11048
     },
     {
-      "level_id": "rs_028",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3146,7 +3114,6 @@
       "seed": 11179
     },
     {
-      "level_id": "rs_029",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3254,7 +3221,6 @@
       "seed": 11310
     },
     {
-      "level_id": "rs_030",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3362,7 +3328,6 @@
       "seed": 11441
     },
     {
-      "level_id": "rs_031",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3470,7 +3435,6 @@
       "seed": 11572
     },
     {
-      "level_id": "rs_032",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3578,7 +3542,6 @@
       "seed": 11703
     },
     {
-      "level_id": "rs_033",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3686,7 +3649,6 @@
       "seed": 11834
     },
     {
-      "level_id": "rs_034",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3794,7 +3756,6 @@
       "seed": 11965
     },
     {
-      "level_id": "rs_035",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -3902,7 +3863,6 @@
       "seed": 12096
     },
     {
-      "level_id": "rs_036",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4010,7 +3970,6 @@
       "seed": 12227
     },
     {
-      "level_id": "rs_037",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4118,7 +4077,6 @@
       "seed": 12358
     },
     {
-      "level_id": "rs_038",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4226,7 +4184,6 @@
       "seed": 12489
     },
     {
-      "level_id": "rs_039",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4334,7 +4291,6 @@
       "seed": 12620
     },
     {
-      "level_id": "rs_040",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4442,7 +4398,6 @@
       "seed": 12751
     },
     {
-      "level_id": "rs_041",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4550,7 +4505,6 @@
       "seed": 12882
     },
     {
-      "level_id": "rs_042",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4658,7 +4612,6 @@
       "seed": 13013
     },
     {
-      "level_id": "rs_043",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4766,7 +4719,6 @@
       "seed": 13144
     },
     {
-      "level_id": "rs_044",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4874,7 +4826,6 @@
       "seed": 13275
     },
     {
-      "level_id": "rs_045",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -4982,7 +4933,6 @@
       "seed": 13406
     },
     {
-      "level_id": "rs_046",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5090,7 +5040,6 @@
       "seed": 13537
     },
     {
-      "level_id": "rs_047",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5198,7 +5147,6 @@
       "seed": 13668
     },
     {
-      "level_id": "rs_048",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5306,7 +5254,6 @@
       "seed": 13799
     },
     {
-      "level_id": "rs_049",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5414,7 +5361,6 @@
       "seed": 13930
     },
     {
-      "level_id": "rs_050",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5522,7 +5468,6 @@
       "seed": 10131
     },
     {
-      "level_id": "rs_051",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5630,7 +5575,6 @@
       "seed": 10262
     },
     {
-      "level_id": "rs_052",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5738,7 +5682,6 @@
       "seed": 10393
     },
     {
-      "level_id": "rs_053",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5846,7 +5789,6 @@
       "seed": 10524
     },
     {
-      "level_id": "rs_054",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -5954,7 +5896,6 @@
       "seed": 10655
     },
     {
-      "level_id": "rs_055",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6062,7 +6003,6 @@
       "seed": 10786
     },
     {
-      "level_id": "rs_056",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6170,7 +6110,6 @@
       "seed": 10917
     },
     {
-      "level_id": "rs_057",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6278,7 +6217,6 @@
       "seed": 11048
     },
     {
-      "level_id": "rs_058",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6386,7 +6324,6 @@
       "seed": 11179
     },
     {
-      "level_id": "rs_059",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6494,7 +6431,6 @@
       "seed": 11310
     },
     {
-      "level_id": "rs_060",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6602,7 +6538,6 @@
       "seed": 11441
     },
     {
-      "level_id": "rs_061",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6710,7 +6645,6 @@
       "seed": 11572
     },
     {
-      "level_id": "rs_062",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6818,7 +6752,6 @@
       "seed": 11703
     },
     {
-      "level_id": "rs_063",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -6926,7 +6859,6 @@
       "seed": 11834
     },
     {
-      "level_id": "rs_064",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7034,7 +6966,6 @@
       "seed": 11965
     },
     {
-      "level_id": "rs_065",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7142,7 +7073,6 @@
       "seed": 12096
     },
     {
-      "level_id": "rs_066",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7250,7 +7180,6 @@
       "seed": 12227
     },
     {
-      "level_id": "rs_067",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7358,7 +7287,6 @@
       "seed": 12358
     },
     {
-      "level_id": "rs_068",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7466,7 +7394,6 @@
       "seed": 12489
     },
     {
-      "level_id": "rs_069",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7574,7 +7501,6 @@
       "seed": 12620
     },
     {
-      "level_id": "rs_070",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7682,7 +7608,6 @@
       "seed": 12751
     },
     {
-      "level_id": "rs_071",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7790,7 +7715,6 @@
       "seed": 12882
     },
     {
-      "level_id": "rs_072",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -7898,7 +7822,6 @@
       "seed": 13013
     },
     {
-      "level_id": "rs_073",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8006,7 +7929,6 @@
       "seed": 13144
     },
     {
-      "level_id": "rs_074",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8114,7 +8036,6 @@
       "seed": 13275
     },
     {
-      "level_id": "rs_075",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8222,7 +8143,6 @@
       "seed": 13406
     },
     {
-      "level_id": "rs_076",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8330,7 +8250,6 @@
       "seed": 13537
     },
     {
-      "level_id": "rs_077",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8438,7 +8357,6 @@
       "seed": 13668
     },
     {
-      "level_id": "rs_078",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8546,7 +8464,6 @@
       "seed": 13799
     },
     {
-      "level_id": "rs_079",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8654,7 +8571,6 @@
       "seed": 13930
     },
     {
-      "level_id": "rs_080",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8762,7 +8678,6 @@
       "seed": 10171
     },
     {
-      "level_id": "rs_081",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8870,7 +8785,6 @@
       "seed": 10263
     },
     {
-      "level_id": "rs_082",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -8978,7 +8892,6 @@
       "seed": 10421
     },
     {
-      "level_id": "rs_083",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9086,7 +8999,6 @@
       "seed": 10585
     },
     {
-      "level_id": "rs_084",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9194,7 +9106,6 @@
       "seed": 10681
     },
     {
-      "level_id": "rs_085",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9302,7 +9213,6 @@
       "seed": 10807
     },
     {
-      "level_id": "rs_086",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9410,7 +9320,6 @@
       "seed": 10971
     },
     {
-      "level_id": "rs_087",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9518,7 +9427,6 @@
       "seed": 11122
     },
     {
-      "level_id": "rs_088",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9626,7 +9534,6 @@
       "seed": 11188
     },
     {
-      "level_id": "rs_089",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9734,7 +9641,6 @@
       "seed": 11330
     },
     {
-      "level_id": "rs_090",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9842,7 +9748,6 @@
       "seed": 11460
     },
     {
-      "level_id": "rs_091",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -9950,7 +9855,6 @@
       "seed": 11586
     },
     {
-      "level_id": "rs_092",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10058,7 +9962,6 @@
       "seed": 11724
     },
     {
-      "level_id": "rs_093",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10166,7 +10069,6 @@
       "seed": 11841
     },
     {
-      "level_id": "rs_094",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10274,7 +10176,6 @@
       "seed": 12022
     },
     {
-      "level_id": "rs_095",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10382,7 +10283,6 @@
       "seed": 12096
     },
     {
-      "level_id": "rs_096",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10490,7 +10390,6 @@
       "seed": 12242
     },
     {
-      "level_id": "rs_097",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10598,7 +10497,6 @@
       "seed": 12370
     },
     {
-      "level_id": "rs_098",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
@@ -10706,7 +10604,6 @@
       "seed": 12490
     },
     {
-      "level_id": "rs_099",
       "grid_size": "6x6",
       "box_shape": "2x3",
       "solution_grid": [
