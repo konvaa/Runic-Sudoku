@@ -1,17 +1,33 @@
-# runic_sudoku
+Runic Sudoku
 
-A new Flutter project.
+Fantasy logická hra pro Android postavená na principu sudoku – 6×6 mřížky s runovými symboly místo čísel, kampaň s narůstající obtížností a volitelný Expert mód. Vydáno pod značkou Jantrel na Google Play pro trhy CZ / SK / AT / DE / PL.
 
-## Getting Started
+Verze: 0.1.1+4 · Stack: Flutter / Dart
 
-This project is a starting point for a Flutter application.
+Ke stažení
 
-A few resources to get you started if this is your first Flutter project:
+Google Play: https://play.google.com/store/apps/details?id=com.konvicny.runicsudoku
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+O aplikaci
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Runic Sudoku bere známý sudoku princip a staví ho do vlastního fantasy světa – runy, magické motivy, tematické kapitoly namísto čistě číselné mřížky. Kampaň je rozdělená do kapitol s pevně danou obtížností (Quick / Normal / Tricky / Deep), doplněná o volitelný Free Play a Expert (12×12) mód pro hráče, kteří chtějí víc než kampaň nabízí.
+
+Technický stack
+Flutter / Dart – multiplatformní engine (aktuálně cíleno na Android)
+Firebase Crashlytics – crash reporting v produkci
+Google Mobile Ads SDK + UMP – monetizace reklamou s plným GDPR/UMP consent flow (EU trhy)
+in_app_purchase – nákup v aplikaci (remove ads)
+shared_preferences – lokální ukládání postupu a profilu hráče
+Architektura
+
+Obsahová vrstva (kapitoly, obtížnosti, levely) je oddělená od herní logiky přes explicitní datový kontrakt (ChapterDefinition / TierDefinition / CampaignRegistry), díky kterému lze bezpečně přidávat nový obsah bez rizika, že se rozbije existující kampaň. Kontrakt je pokrytý diferenciálním testem porovnávajícím stovky herních stavů proti referenční implementaci.
+
+Levely mají stabilní explicitní ID napříč kapitolami, což umožňuje bezpečné verzování obsahu i zpětnou kompatibilitu uložených postupů hráčů.
+
+Stav vývoje
+✅ Kapitola 1 – hotová a live
+🚧 Kapitola 2 – datový model a obsah ve vývoji
+📋 Plán: Free Play (9×9), rozšíření Expert módu
+Jantrel
+
+Runic Sudoku je první titul vydaný pod indie herní značkou Jantrel. Web: jantrel-web.web.app
