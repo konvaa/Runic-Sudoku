@@ -1,33 +1,45 @@
-Runic Sudoku
+# Runic Sudoku
 
-Fantasy logická hra pro Android postavená na principu sudoku – 6×6 mřížky s runovými symboly místo čísel, kampaň s narůstající obtížností a volitelný Expert mód. Vydáno pod značkou Jantrel na Google Play pro trhy CZ / SK / AT / DE / PL.
+Fantasy logická hra pro Android na principu sudoku: mřížky 6×6 s runovými
+symboly místo čísel, kampaň ve čtyřech kapitolách obtížnosti (Quick /
+Normal / Tricky / Deep) a režim Free Play.
+První titul vydaný pod indie značkou Jantrel.
 
-Verze: 0.1.1+4 · Stack: Flutter / Dart
+**[Stáhnout na Google Play](https://play.google.com/store/apps/details?id=com.konvicny.runicsudoku)**
 
-Ke stažení
+<!-- Screenshot: doplnit obrázek a odkomentovat.
+![Runic Sudoku – herní obrazovka](docs/screenshots/gameplay.png)
+-->
 
-Google Play: https://play.google.com/store/apps/details?id=com.konvicny.runicsudoku
+## Stack
 
-O aplikaci
+- **Flutter / Dart**, aktuálně cíleno na Android
+- **Firebase Crashlytics**: hlášení pádů v produkci
+- **Google Mobile Ads + UMP**: reklamy s GDPR consent flow (trhy EU)
+- **in_app_purchase**: nákup odstranění reklam
+- **shared_preferences**: lokální uložení postupu a profilu hráče
 
-Runic Sudoku bere známý sudoku princip a staví ho do vlastního fantasy světa – runy, magické motivy, tematické kapitoly namísto čistě číselné mřížky. Kampaň je rozdělená do kapitol s pevně danou obtížností (Quick / Normal / Tricky / Deep), doplněná o volitelný Free Play a Expert (12×12) mód pro hráče, kteří chtějí víc než kampaň nabízí.
+## Co je potřeba k buildu
 
-Technický stack
-Flutter / Dart – multiplatformní engine (aktuálně cíleno na Android)
-Firebase Crashlytics – crash reporting v produkci
-Google Mobile Ads SDK + UMP – monetizace reklamou s plným GDPR/UMP consent flow (EU trhy)
-in_app_purchase – nákup v aplikaci (remove ads)
-shared_preferences – lokální ukládání postupu a profilu hráče
-Architektura
+Tři soubory v repozitáři nejsou. Jsou vázané na můj Firebase projekt
+a podpisový klíč, pro vlastní build si je vytvoříš sám:
 
-Obsahová vrstva (kapitoly, obtížnosti, levely) je oddělená od herní logiky přes explicitní datový kontrakt (ChapterDefinition / TierDefinition / CampaignRegistry), díky kterému lze bezpečně přidávat nový obsah bez rizika, že se rozbije existující kampaň. Kontrakt je pokrytý diferenciálním testem porovnávajícím stovky herních stavů proti referenční implementaci.
+| Soubor | Jak ho získat |
+|---|---|
+| `android/app/google-services.json` | Firebase Console → Project settings → Android app → stáhnout |
+| `lib/firebase_options.dart` | `dart pub global activate flutterfire_cli` a pak `flutterfire configure` |
+| `android/key.properties` | zkopírovat `android/key.properties.example` a vyplnit (keystore vytvoříš přes `keytool`) |
 
-Levely mají stabilní explicitní ID napříč kapitolami, což umožňuje bezpečné verzování obsahu i zpětnou kompatibilitu uložených postupů hráčů.
+`android/key.properties` je v současné konfiguraci potřeba i pro debug build,
+protože `android/app/build.gradle.kts` čte podpisové hodnoty bez fallbacku.
 
-Stav vývoje
-✅ Kapitola 1 – hotová a live
-🚧 Kapitola 2 – datový model a obsah ve vývoji
-📋 Plán: Free Play (9×9), rozšíření Expert módu
-Jantrel
+## Spuštění
 
-Runic Sudoku je první titul vydaný pod indie herní značkou Jantrel. Web: jantrel-web.web.app
+```sh
+flutter pub get
+flutter run                     # připojené zařízení nebo emulátor
+flutter test
+flutter build appbundle         # release pro Google Play
+```
+
+Vyžaduje Flutter 3.27+ (Dart 3.4+) a Android API 23+.

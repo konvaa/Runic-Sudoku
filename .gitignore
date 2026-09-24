@@ -55,3 +55,17 @@ key.properties
 lib/firebase_options.dart
 
 
+# --- Doplněno 2026-09-24 (úklid před zveřejněním) ---
+# Zbytky zámků a dočasných objektů z dřívějších sezení; nesmí se dostat do commitu.
+_to_delete/
+
+# Proměnné prostředí (projekt je teď nepoužívá, preventivně).
+.env*
+!.env.example
+
+# iOS obdoba google-services.json - vázaná na konkrétní Firebase projekt.
+ios/Runner/GoogleService-Info.plist
+
+# Certifikáty a klíče (upload certifikát pro Play, případné iOS certifikáty).
+*.p12
+*.pem

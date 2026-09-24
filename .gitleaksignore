@@ -1,0 +1,11 @@
+# Falešný poplach: Firebase API klíč (AIza...) v commitu 90d4893.
+#
+# Klíč z google-services.json / firebase_options.dart NENÍ tajný údaj. Firebase ho
+# vkládá do každé sestavené aplikace (je čitelný z APK na Google Play) a slouží
+# jen k identifikaci projektu. Ochranu zajišťují restrikce klíče v Google Cloud
+# Console (omezení na Android aplikaci a vybraná API), které jsou nastavené.
+# Oba soubory jsou od té doby v .gitignore a mimo sledování.
+#
+# Formát: commit:soubor:pravidlo:řádek (fingerprint z `gitleaks git -v`).
+90d4893ec82995f056650b45182c3a5afeba84bd:android/app/google-services.json:gcp-api-key:18
+90d4893ec82995f056650b45182c3a5afeba84bd:lib/firebase_options.dart:gcp-api-key:33

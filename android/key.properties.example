@@ -1,0 +1,12 @@
+# Vzor pro android/key.properties - podpis release buildu.
+# Zkopíruj jako android/key.properties a vyplň. Skutečný soubor je v .gitignore
+# a do repozitáře nepatří (obsahuje hesla ke keystore).
+#
+# Pozor: android/app/build.gradle.kts čte tyto hodnoty bez fallbacku, takže bez
+# key.properties neprojde ani debug build.
+storePassword=<heslo-ke-keystore>
+keyPassword=<heslo-ke-klici>
+keyAlias=upload
+# Cesta je relativní k android/app/, případně absolutní, např.:
+# storeFile=C:/Users/<uzivatel>/keystores/upload-keystore.jks
+storeFile=<cesta-k-upload-keystore.jks>
